@@ -1015,7 +1015,7 @@ if (urlParams.has("maxchars")){
 // Option 4: Auto-split on sentence boundaries
 var autoSplit = urlParams.has("autosplit");
 
-var txtFile = "";
+var srtFile = "";
 var timestamp_start = null
 var timestamp_stop = null
 var timestamp_intern  = null;
@@ -1023,7 +1023,7 @@ var logcounter=0;
 // Track previous cue's end time in ms (relative to session start)
 var lastStopMs = 0;
 // Maintain structured cues so we can post-trim to avoid overlaps
-var txtCues = []; // {startMs, endMs, text}
+var srtCues = []; // {startMs, endMs, text}
 // minimum duration for a cue (override with &minCueMs=###)
 var MIN_CUE_MS = (function() {
   var val = urlParams && urlParams.get && urlParams.get('minCueMs');
@@ -1031,7 +1031,7 @@ var MIN_CUE_MS = (function() {
   return (Number.isFinite(n) && n >= 0) ? n : 500;
 })();
 
-function formattxtTime(ms) {
+function formatSrtTime(ms) {
   var t = Math.max(0, Math.floor(ms));
   var hh = Math.floor(t / 3600000); t -= hh * 3600000;
   var mm = Math.floor(t / 60000);   t -= mm * 60000;
@@ -1041,7 +1041,7 @@ function formattxtTime(ms) {
   return pad(hh,2) + ':' + pad(mm,2) + ':' + pad(ss,2) + ',' + pad(ms3,3);
 }
 
-function rebuildtxtFile() {
+function rebuildSrtFile() {
   var out = "";
   // Create a shallow copy to adjust on render, ensuring non-overlap & min durations
   for (var i = 0; i < srtCues.length; i++) {
@@ -1074,8 +1074,8 @@ function rebuildtxtFile() {
 					try {
 						var button = document.createElement("button");
 						button.onclick = function(){
-							var txtFile = getStorage(this.dataset.key);
-							download(this.dataset.key+".txt", txtFile);
+							var srtFile = getStorage(this.dataset.key);
+							download(this.dataset.key+".srt", srtFile);
 							localStorage.removeItem(this.dataset.key);
 						};
 						button.dataset.key = oldSaves[i];
