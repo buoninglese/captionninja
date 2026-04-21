@@ -926,21 +926,21 @@
 
 	// Language Toggle Feature - enables quick switching between languages
 	// Usage: &togglelang=en-US,fr-FR or &togglelang=en-US,fr-FR,es-ES
-	var toggleLanguages = [];
+	var toggleLanguages = ["en-US", "it-IT"];
 	var currentLangIndex = 0;
 	
 	if (urlParams.has("togglelang")) {
-		var toggleParam = urlParams.get("togglelang");
-		toggleLanguages = toggleParam.split(",").map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
-		
-		if (toggleLanguages.length >= 2) {
-			// Find current language in the toggle list, or default to first
-			currentLangIndex = toggleLanguages.indexOf(myLang);
-			if (currentLangIndex === -1) {
-				// Current lang not in list, set to first toggle language
-				currentLangIndex = 0;
-				myLang = toggleLanguages[0];
-				updateURL("lang=" + myLang, true);
+    var toggleParam = urlParams.get("togglelang");
+    toggleLanguages = toggleParam.split(",").map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+    
+    if (toggleLanguages.length >= 2) {
+        // Find current language in the toggle list, or default to first
+        currentLangIndex = toggleLanguages.indexOf(myLang);
+        if (currentLangIndex === -1) {
+            // Current lang not in list, set to first toggle language
+            currentLangIndex = 0;
+            myLang = toggleLanguages[0];
+            updateURL("lang=" + myLang, true);	
 			}
 			
 			// Show the toggle UI
