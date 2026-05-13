@@ -58,7 +58,7 @@
 		a {
 			color: var(--primary-2);
 			text-decoration: none;
-			word-break: break-all;
+			word-break: break-word;
 		}
 
 		a:hover {
@@ -129,8 +129,16 @@
 			color: var(--muted);
 			font-size: 1rem;
 			line-height: 1.6;
-			margin-bottom: 22px;
+			margin-bottom: 12px;
 			max-width: 42ch;
+		}
+
+		.brand-descriptor {
+			margin: 0 0 22px;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: #cfe2ff;
 		}
 
 		.info-grid {
@@ -291,11 +299,28 @@
 			cursor: pointer;
 			font-weight: 700;
 			font-size: 14px;
+			transition: transform 0.12s ease, background 0.18s ease, border-color 0.18s ease;
 		}
 
 		.control-button:hover {
 			background: rgba(36, 152, 235, 0.12);
 			border-color: rgba(79, 182, 255, 0.28);
+			transform: translateY(-1px);
+		}
+
+		.control-button-primary {
+			background: linear-gradient(180deg, #35b0ff 0%, #1f8fe0 100%);
+			border: 1px solid rgba(120, 200, 255, 0.35);
+			color: white;
+			box-shadow: 0 14px 32px rgba(36, 152, 235, 0.28);
+			font-weight: 800;
+			padding: 12px 18px;
+			font-size: 15px;
+		}
+
+		.control-button-primary:hover {
+			background: linear-gradient(180deg, #44b8ff 0%, #2798ea 100%);
+			border-color: rgba(140, 215, 255, 0.45);
 		}
 
 		.control-button.paused {
@@ -364,6 +389,19 @@
 			border-radius: 10px;
 			margin-bottom: 8px;
 			max-width: 100%;
+		}
+
+		.footer-note {
+			margin-top: 22px;
+			padding-top: 18px;
+			border-top: 1px solid rgba(111, 168, 255, 0.12);
+			color: #8ea7cc;
+			font-size: 13px;
+			line-height: 1.7;
+		}
+
+		.footer-note strong {
+			color: #dcecff;
 		}
 
 		.error-banner {
@@ -435,6 +473,7 @@
 			}
 
 			.control-button,
+			.control-button-primary,
 			.lang-toggle-btn {
 				width: 100%;
 			}
@@ -457,9 +496,9 @@
 			<div class="eyebrow">Buon Inglese • Live Tool</div>
 			<h1 class="brand-title">Live captions for <span>English ↔ Italian</span></h1>
 			<p class="brand-copy">
-				A cleaner version of your caption tool for classes, speaking practice, tutoring, and bilingual conversation support.
-				It only uses English and Italian, and the overlay automatically shows the opposite language.
+				A free browser tool by Buon Inglese for live English–Italian captions, lessons, speaking practice, and bilingual conversation support.
 			</p>
+			<p class="brand-descriptor">Private English Lessons in Bari</p>
 
 			<div class="info-grid">
 				<div class="info-card">
@@ -485,7 +524,7 @@
 				<li>Allow microphone access.</li>
 				<li>Choose the source language using the EN/IT toggle.</li>
 				<li>Speak naturally and watch the captions appear live.</li>
-				<li>Open the overlay link to display the bilingual output.</li>
+				<li>Open the dashboard to display the bilingual overlay.</li>
 			</ol>
 
 			<h2 class="section-title">Notes</h2>
@@ -493,12 +532,19 @@
 				<li>This version is locked to English and Italian only.</li>
 				<li>English speech produces Italian translation in the overlay.</li>
 				<li>Italian speech produces English translation in the overlay.</li>
-				<li>You can download an SRT transcript or copy a Framer embed snippet.</li>
+				<li>You can still download an SRT transcript or copy a Framer embed snippet.</li>
 			</ul>
 
 			<div class="share-box">
-				<strong>Overlay link</strong>
+				<strong>Overlay URL</strong>
 				<a id="shareLink" href="overlay.html" target="_blank" rel="noopener noreferrer">*ERROR GENERATING LINK*</a>
+			</div>
+
+			<div class="footer-note">
+				<strong>Contact</strong><br />
+				Private English Lessons in Bari ·
+				<a href="mailto:sebastian@buoninglese.com">sebastian@buoninglese.com</a><br />
+				This tool is designed for live bilingual captions and practice support.
 			</div>
 		</aside>
 
@@ -877,25 +923,20 @@
 			if (controlContainer.dataset.enhanced === "1") return;
 			controlContainer.dataset.enhanced = "1";
 
+			var dashboardButton = document.createElement("button");
+			dashboardButton.innerHTML = "Live Speech Dashboard";
+			dashboardButton.className = "control-button control-button-primary";
+			dashboardButton.onclick = function() {
+				const overlayUrl = buildOverlayUrl();
+				window.open(overlayUrl, "_blank", "noopener,noreferrer");
+			};
+
 			var downloadButton = document.createElement("button");
 			downloadButton.innerHTML = "Download SRT";
 			downloadButton.className = "control-button";
 			downloadButton.onclick = function() {
 				rebuildSrtFile();
 				download("buoninglese-live.srt", srtFile);
-			};
-
-			var shareButton = document.createElement("button");
-			shareButton.innerHTML = "Copy Overlay Link";
-			shareButton.className = "control-button";
-			shareButton.onclick = function() {
-				const overlayUrl = buildOverlayUrl();
-				navigator.clipboard.writeText(overlayUrl).then(() => {
-					shareButton.innerHTML = "Overlay Link Copied!";
-					setTimeout(() => shareButton.innerHTML = "Copy Overlay Link", 2000);
-				}).catch(() => {
-					showError("Could not copy overlay link.");
-				});
 			};
 
 			var framerButton = document.createElement("button");
@@ -914,8 +955,8 @@
 			toggleButton.classList.remove("hidden");
 
 			controlContainer.prepend(downloadButton);
-			controlContainer.prepend(shareButton);
 			controlContainer.prepend(framerButton);
+			controlContainer.prepend(dashboardButton);
 		}
 
 		function connectWebSocket() {
