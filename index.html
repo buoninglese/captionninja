@@ -1,549 +1,826 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Buon Inglese Live</title>
-  <meta name="description" content="Live Italian-English captions and translation for Buon Inglese.">
-  <style>
-    :root{
-      --bg:#0f172a;
-      --bg-2:#111827;
-      --panel:#111827;
-      --panel-2:#1f2937;
-      --surface:#0b1220;
-      --text:#f8fafc;
-      --muted:#cbd5e1;
-      --border:#334155;
-      --primary:#2563eb;
-      --primary-hover:#1d4ed8;
-      --danger:#dc2626;
-      --success:#16a34a;
-      --radius:18px;
-      --shadow:0 20px 50px rgba(0,0,0,.35);
-    }
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    *{box-sizing:border-box}
+	<title>Buon Inglese Live Captions</title>
+	<meta name="title" content="Buon Inglese Live Captions" />
+	<meta name="description" content="Live English-Italian captions and translation for Buon Inglese." />
+	<meta name="robots" content="index, follow" />
 
-    html,body{
-      margin:0;
-      padding:0;
-      min-height:100%;
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 28%),
-        linear-gradient(180deg, var(--surface) 0%, var(--bg) 45%, var(--bg-2) 100%);
-      color:var(--text);
-    }
+	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+	<link rel="shortcut icon" href="favicon.svg" />
 
-    body{
-      min-height:100vh;
-    }
+	<style>
+		@font-face {
+			font-family: 'Cousine';
+			src: url('fonts/Cousine-Bold.ttf') format('truetype');
+		}
 
-    .page{
-      max-width:1240px;
-      margin:0 auto;
-      padding:24px;
-    }
+		:root {
+			--primary-color: #2498eb;
+			--secondary-color: #1e293b;
+			--background-color: #0000;
+			--text-color: #333;
+			--border-radius: 6px;
+			--cc-background: #000000;
+			--cc-text-color: #ffffff;
+			--cc-font-size: 24px;
+			--cc-line-height: 1.2;
+		}
 
-    .hero{
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:22px;
-      align-items:stretch;
-    }
+		* {
+			box-sizing: border-box;
+		}
 
-    .panel{
-      background:rgba(17,24,39,.88);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
-    }
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+			background: transparent;
+		}
 
-    .intro{
-      padding:28px;
-    }
+		body {
+			padding: 0 10px;
+			height: 100%;
+			border: 0;
+			display: flex;
+			flex-direction: column-reverse;
+			position: absolute;
+			bottom: 0;
+			overflow: hidden;
+			max-width: calc(100vw - 20px);
+			font-family: Arial, sans-serif;
+		}
 
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      background:rgba(37,99,235,.14);
-      border:1px solid rgba(96,165,250,.25);
-      color:#bfdbfe;
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:.02em;
-      margin-bottom:16px;
-    }
+		.hidden {
+			display: none !important;
+		}
 
-    h1{
-      margin:0 0 10px;
-      font-size:clamp(32px,5vw,58px);
-      line-height:1.02;
-      letter-spacing:-.03em;
-    }
+		.output {
+			margin: 0;
+			background-color: #0000;
+			color: white;
+			font-family: Cousine, monospace;
+			font-size: 3.2em;
+			line-height: 1.1em;
+			letter-spacing: 0;
+			padding: 0;
+			text-shadow: 0.05em 0.05em 0 rgba(0,0,0,1);
+			direction: auto;
+			unicode-bidi: bidi-override;
+		}
 
-    .lead{
-      margin:0;
-      color:var(--muted);
-      font-size:clamp(16px,2vw,19px);
-      line-height:1.6;
-      max-width:60ch;
-    }
+		.output span {
+			background-color: black;
+			padding: 8px 8px 0 8px;
+			margin: 0;
+			display: inline-block;
+			direction: inherit;
+			text-align: start;
+			max-width: 100%;
+		}
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-      margin-top:22px;
-    }
+		a {
+			color: white;
+			font-size: 1.1em;
+			text-transform: none;
+		}
 
-    .stat{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      padding:14px;
-    }
+		.small-text-container {
+			background-color: black;
+			padding: 10px;
+			margin-top: 10px;
+		}
 
-    .stat strong{
-      display:block;
-      font-size:20px;
-      margin-bottom:6px;
-    }
+		.control-buttons {
+			position: fixed;
+			top: 10px;
+			left: 10px;
+			right: 10px;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+			gap: 10px;
+			z-index: 2000;
+		}
 
-    .stat span{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.4;
-    }
+		.control-button {
+			background-color: var(--primary-color);
+			color: white;
+			border: none;
+			padding: 10px 16px;
+			border-radius: var(--border-radius);
+			cursor: pointer;
+			font-weight: bold;
+			transition: background-color 0.25s ease, transform 0.1s ease;
+			font-size: 14px;
+		}
 
-    .control-panel{
-      padding:24px;
-    }
+		.control-button:hover {
+			background-color: var(--secondary-color);
+		}
 
-    .control-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:14px;
-      margin-bottom:18px;
-    }
+		.control-button:active {
+			transform: scale(0.98);
+		}
 
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
+		.control-button.paused {
+			background-color: #dc3545;
+		}
 
-    .field label{
-      font-size:13px;
-      color:#cbd5e1;
-      font-weight:700;
-      letter-spacing:.02em;
-    }
+		.lang-toggle-container {
+			position: fixed;
+			top: 10px;
+			left: 10px;
+			z-index: 1000;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			background: rgba(0, 0, 0, 0.85);
+			padding: 8px 12px;
+			border-radius: 6px;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		}
 
-    .field input,
-    .field select{
-      width:100%;
-      background:#0b1220;
-      color:#fff;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px 14px;
-      font-size:15px;
-      outline:none;
-    }
+		.lang-toggle-label {
+			color: #9aa3b2;
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
 
-    .field input:focus,
-    .field select:focus{
-      border-color:#60a5fa;
-      box-shadow:0 0 0 3px rgba(96,165,250,.18);
-    }
+		.lang-toggle-btn {
+			background: var(--primary-color);
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 4px;
+			cursor: pointer;
+			font-weight: 600;
+			font-size: 14px;
+			transition: background-color 0.2s, transform 0.1s;
+			min-width: 60px;
+			text-align: center;
+		}
 
-    .buttons{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:8px;
-    }
+		.lang-toggle-btn:hover {
+			background: #1d7acc;
+		}
 
-    button{
-      appearance:none;
-      border:0;
-      border-radius:12px;
-      padding:14px 18px;
-      font-size:15px;
-      font-weight:800;
-      cursor:pointer;
-      transition:transform .15s ease, background .2s ease, opacity .2s ease;
-    }
+		.lang-toggle-btn:active {
+			transform: scale(0.98);
+		}
 
-    button:hover{ transform:translateY(-1px); }
-    button:disabled{ opacity:.65; cursor:not-allowed; transform:none; }
+		.lang-toggle-shortcut {
+			color: #6b7280;
+			font-size: 10px;
+			margin-left: 4px;
+		}
 
-    .btn-primary{
-      background:var(--primary);
-      color:#fff;
-    }
+		.error-banner {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			background-color: #dc3545;
+			color: white;
+			padding: 10px;
+			text-align: center;
+			z-index: 10000;
+			font-size: 16px;
+			display: none;
+		}
 
-    .btn-primary:hover{
-      background:var(--primary-hover);
-    }
+		.error-banner button {
+			background-color: white;
+			color: #dc3545;
+			border: none;
+			padding: 5px 10px;
+			margin-left: 10px;
+			border-radius: 4px;
+			cursor: pointer;
+		}
 
-    .btn-secondary{
-      background:var(--panel-2);
-      color:#fff;
-      border:1px solid var(--border);
-    }
+		@media (max-width: 768px) {
+			.small-text-container {
+				padding: 5px;
+				margin-top: 5px;
+			}
 
-    .btn-danger{
-      background:var(--danger);
-      color:#fff;
-    }
+			.output {
+				font-size: 2.2em;
+				line-height: 1em;
+				text-shadow: 0.03em 0.03em 0 rgba(0,0,0,1);
+			}
 
-    .status-wrap{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:16px;
-      align-items:center;
-    }
+			.output span {
+				padding: 5px 5px 0 5px;
+			}
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-      font-size:14px;
-      color:#e5e7eb;
-    }
+			body {
+				padding: 0 5px;
+				max-width: calc(100vw - 10px);
+			}
 
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:#64748b;
-      display:inline-block;
-      box-shadow:0 0 0 0 rgba(100,116,139,.6);
-    }
+			.control-button {
+				padding: 8px 12px;
+				font-size: 14px;
+			}
 
-    .dot.live{
-      background:#ef4444;
-      animation:pulse 1.6s infinite;
-    }
+			ol, ul {
+				padding-left: 20px;
+			}
 
-    .dot.ready{
-      background:#22c55e;
-    }
+			.small-text-container font {
+				font-size: 40% !important;
+			}
+		}
 
-    @keyframes pulse{
-      0%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}
-      70%{box-shadow:0 0 0 12px rgba(239,68,68,0)}
-      100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}
-    }
+		@media (max-width: 480px) {
+			.output {
+				font-size: 1.6em;
+			}
 
-    .error{
-      display:none;
-      margin-top:16px;
-      background:#7f1d1d;
-      border:1px solid #b91c1c;
-      color:#fff;
-      padding:14px 16px;
-      border-radius:14px;
-      line-height:1.45;
-    }
-
-    .embed-section{
-      margin-top:22px;
-    }
-
-    .viewer-shell{
-      overflow:hidden;
-      border-radius:22px;
-      border:1px solid var(--border);
-      background:#fff;
-      box-shadow:var(--shadow);
-    }
-
-    .viewer-topbar{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:space-between;
-      gap:12px;
-      background:#f8fafc;
-      color:#334155;
-      border-bottom:1px solid #e5e7eb;
-      padding:12px 16px;
-      font-size:14px;
-      font-weight:600;
-    }
-
-    .viewer-topbar strong{
-      color:#0f172a;
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:680px;
-      border:0;
-      background:#fff;
-    }
-
-    .embed-code{
-      margin-top:18px;
-      padding:18px;
-      border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    .embed-code h2{
-      margin:0 0 8px;
-      font-size:18px;
-    }
-
-    .embed-code p{
-      margin:0 0 12px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    textarea{
-      width:100%;
-      min-height:140px;
-      resize:vertical;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:#08101d;
-      color:#e2e8f0;
-      padding:14px;
-      font-size:13px;
-      line-height:1.45;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-    }
-
-    .footer-note{
-      margin-top:12px;
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .full{
-      grid-column:1 / -1;
-    }
-
-    @media (max-width: 980px){
-      .hero{
-        grid-template-columns:1fr;
-      }
-
-      .control-grid,
-      .stats{
-        grid-template-columns:1fr;
-      }
-
-      iframe{
-        height:560px;
-      }
-    }
-
-    @media (max-width: 640px){
-      .page{ padding:16px; }
-      .intro, .control-panel{ padding:18px; }
-      .buttons{ flex-direction:column; }
-      button{ width:100%; }
-      iframe{ height:480px; }
-    }
-  </style>
+			.small-text-container font {
+				font-size: 50% !important;
+			}
+		}
+	</style>
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <div class="panel intro">
-        <div class="eyebrow">Buon Inglese • Live Italian-English captions</div>
-        <h1>Speak in Italian or English. Show both on screen.</h1>
-        <p class="lead">
-          This page captures live speech in one language and displays both the original text and the translation in the embedded viewer below.
-          It is intentionally limited to English and Italian only.
-        </p>
+	<div id="errorBanner" class="error-banner">
+		<span id="errorMessage"></span>
+		<button id="dismissError">Dismiss</button>
+	</div>
 
-        <div class="stats">
-          <div class="stat">
-            <strong>2 languages</strong>
-            <span>Only English and Italian, so the interface stays simple.</span>
-          </div>
-          <div class="stat">
-            <strong>1 page</strong>
-            <span>Safer for your setup because you can keep using <code>index.html</code>.</span>
-          </div>
-          <div class="stat">
-            <strong>1 embed</strong>
-            <span>Copy the generated iframe code directly into Framer.</span>
-          </div>
-        </div>
-      </div>
+	<div id="langToggleContainer" class="lang-toggle-container">
+		<span class="lang-toggle-label">Source:</span>
+		<button id="langToggleBtn" class="lang-toggle-btn" title="Switch source language (Ctrl+L)">
+			<span id="langToggleCurrent" class="lang-code">EN</span>
+		</button>
+		<span class="lang-toggle-shortcut">Ctrl+L</span>
+	</div>
 
-      <div class="panel control-panel">
-        <div class="control-grid">
-          <div class="field">
-            <label for="roomInput">Room ID</label>
-            <input id="roomInput" type="text" placeholder="Auto-generated if left empty">
-          </div>
+	<div id="interm" class="output">
+		<font style="font-size:60%;line-height: 1.4em;"><span>Welcome to Buon Inglese Live</span></font>
 
-          <div class="field">
-            <label for="sourceLang">Source language</label>
-            <select id="sourceLang">
-              <option value="en-US">English</option>
-              <option value="it-IT">Italian</option>
-            </select>
-          </div>
+		<div class="small-text-container">
+			<font style="font-size:30%;line-height: 1.4em;">
+				<span>
+					<br />
+					<strong>📖 BUON INGLESE LIVE:</strong>
+					<ol>
+						<li>Accept the microphone permissions when prompted.</li>
+						<li>Start speaking and your words will appear as captions.</li>
+						<li>Use the language toggle to switch between English and Italian.</li>
+						<li><a id="shareLink" href="overlay.html" target="_blank" rel="noopener noreferrer">*ERROR GENERATING LINK*</a></li>
+					</ol>
 
-          <div class="field full">
-            <label for="viewerUrlInput">Viewer URL for Framer</label>
-            <input id="viewerUrlInput" type="text" readonly>
-          </div>
-        </div>
+					<strong>💡 Tips:</strong>
+					<ul>
+						<li>Use Google Chrome or Microsoft Edge for best results.</li>
+						<li>To save the transcription: Select all, copy, and paste into a text editor.</li>
+					</ul>
 
-        <div class="buttons">
-          <button id="startBtn" class="btn-primary">Start captions</button>
-          <button id="pauseBtn" class="btn-secondary" style="display:none;">Pause</button>
-          <button id="switchBtn" class="btn-secondary">Switch language</button>
-          <button id="copyViewerBtn" class="btn-secondary">Copy viewer URL</button>
-          <button id="copyIframeBtn" class="btn-secondary">Copy iframe embed</button>
-        </div>
+					<strong>🌐 Translation:</strong>
+					<ul>
+						<li>This version is locked to English and Italian only.</li>
+						<li>The overlay automatically translates to the opposite language.</li>
+						<li>English source gives Italian translation; Italian source gives English translation.</li>
+					</ul>
+				</span>
+			</font>
+		</div>
+		<br />
+	</div>
 
-        <div class="status-wrap">
-          <div class="pill"><span id="statusDot" class="dot"></span><span id="statusText">Idle</span></div>
-          <div class="pill">Room: <strong id="roomText">—</strong></div>
-          <div class="pill">Translation: <strong id="targetText">Italian</strong></div>
-        </div>
+	<div id="output" class="output"></div>
+	<button id="toggleTranscription" class="hidden control-button">Pause Transcription</button>
 
-        <div id="errorBox" class="error"></div>
-      </div>
-    </section>
+	<script src="security-utils.js"></script>
+	<script src="tts-integration.js"></script>
+	<script src="ws-publisher.js"></script>
+	<script src="text-rules.js"></script>
+	<script>
+		function detectTextDirection(text) {
+			const rtlChars = /[\u0591-\u07FF\u200F\u202B\u202E\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+			return rtlChars.test(text) ? 'rtl' : 'ltr';
+		}
 
-    <section class="embed-section">
-      <div class="viewer-shell">
-        <div class="viewer-topbar">
-          <div>Source: <strong id="sourceLabel">English</strong></div>
-          <div>Translation: <strong id="targetLabel">Italian</strong></div>
-        </div>
-        <iframe id="viewerFrame" allow="microphone"></iframe>
-      </div>
+		function showError(message) {
+			const banner = document.getElementById("errorBanner");
+			const text = document.getElementById("errorMessage");
+			text.textContent = message;
+			banner.style.display = "block";
+		}
 
-      <div class="embed-code">
-        <h2>Framer embed code</h2>
-        <p>
-          In Framer, add an Embed element and paste either the viewer URL or the iframe HTML. Framer supports URL-based iframe embeds and HTML/script embeds in its Embed component. [web:16][web:5]
-        </p>
-        <textarea id="iframeCode" readonly></textarea>
-        <div class="footer-note">
-          Important: this page captures the microphone, while the embedded viewer only displays captions. Caption.Ninja’s model uses a capture page plus an overlay page connected by the same room ID. [web:36][web:71]
-        </div>
-      </div>
-    </section>
-  </main>
+		function hideError() {
+			document.getElementById("errorBanner").style.display = "none";
+		}
 
-  <script src="./security-utils.js"></script>
-  <script src="./ws-publisher.js"></script>
-  <script>
-    const state = {
-      roomID: "",
-      myLang: "en-US",
-      recognition: null,
-      wsPublisher: null,
-      isPaused: false,
-      counter: 0,
-      ends: 0,
-      startd: false
-    };
+		document.getElementById("dismissError").addEventListener("click", hideError);
 
-    const roomInput = document.getElementById("roomInput");
-    const sourceLang = document.getElementById("sourceLang");
-    const viewerFrame = document.getElementById("viewerFrame");
-    const viewerUrlInput = document.getElementById("viewerUrlInput");
-    const iframeCode = document.getElementById("iframeCode");
-    const roomText = document.getElementById("roomText");
-    const sourceLabel = document.getElementById("sourceLabel");
-    const targetLabel = document.getElementById("targetLabel");
-    const targetText = document.getElementById("targetText");
-    const statusText = document.getElementById("statusText");
-    const statusDot = document.getElementById("statusDot");
-    const errorBox = document.getElementById("errorBox");
+		function download(filename, text) {
+			var element = document.createElement('a');
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+			element.setAttribute('download', filename);
+			element.style.display = 'none';
+			document.body.appendChild(element);
+			element.click();
+			document.body.removeChild(element);
+		}
 
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const switchBtn = document.getElementById("switchBtn");
-    const copyViewerBtn = document.getElementById("copyViewerBtn");
-    const copyIframeBtn = document.getElementById("copyIframeBtn");
+		function getOldStorage() {
+			var values = [], keys = Object.keys(localStorage), i = keys.length;
+			while (i--) values.push(localStorage.getItem(keys[i]));
+			return values;
+		}
 
-    function showError(message){
-      errorBox.style.display = "block";
-      errorBox.textContent = message;
-    }
+		function removeStorage(cname) {
+			localStorage.removeItem(cname);
+		}
 
-    function clearError(){
-      errorBox.style.display = "none";
-      errorBox.textContent = "";
-    }
+		function setStorage(cname, cvalue, exdays = 999) {
+			var now = new Date();
+			var item = {
+				value: cvalue,
+				expiry: now.getTime() + (exdays * 24 * 60 * 60 * 1000),
+			};
+			try {
+				localStorage.setItem(cname, JSON.stringify(item));
+			} catch (e) {
+				console.error(e);
+			}
+		}
 
-    function setStatus(text, mode){
-      statusText.textContent = text;
-      statusDot.className = "dot";
-      if (mode === "live") statusDot.classList.add("live");
-      if (mode === "ready") statusDot.classList.add("ready");
-    }
+		function getStorage(cname) {
+			try {
+				var itemStr = localStorage.getItem(cname);
+			} catch (e) {
+				console.error(e);
+				return "";
+			}
+			if (!itemStr) return "";
+			var item = JSON.parse(itemStr);
+			var now = new Date();
+			if (now.getTime() > item.expiry) {
+				localStorage.removeItem(cname);
+				return "";
+			}
+			return item.value;
+		}
 
-    function sanitize(string) {
-      const temp = document.createElement("div");
-      temp.textContent = string;
-      return temp.textContent.substring(0, 500).trim();
-    }
+		let isPaused = false;
+		const toggleButton = document.getElementById('toggleTranscription');
 
-    function generateSecureRoomID(len = 16) {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let out = "";
-      const cryptoObj = window.crypto || window.msCrypto;
-      if (cryptoObj && typeof cryptoObj.getRandomValues === "function") {
-        const randomValues = new Uint8Array(len);
-        cryptoObj.getRandomValues(randomValues);
-        for (let i = 0; i < len; i++) {
-          out += chars.charAt(randomValues[i] % chars.length);
-        }
-        return out;
-      }
-      for (let i = 0; i < len; i++) {
-        out += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return out;
-    }
+		toggleButton.addEventListener('click', () => {
+			isPaused = !isPaused;
+			if (isPaused) {
+				recognition.stop();
+				toggleButton.textContent = 'Resume Transcription';
+				toggleButton.classList.add('paused');
+			} else {
+				recognition.start();
+				toggleButton.textContent = 'Pause Transcription';
+				toggleButton.classList.remove('paused');
+			}
+		});
 
-    function getTargetLanguage(){
-      return state.myLang === "en-US" ? "it" : "en";
-    }
+		function updateURL(param, force=false) {
+			var para = param.split('=');
+			if (!(urlParams.has(para[0].toLowerCase()))) {
+				if (history.pushState) {
+					var arr = window.location.href.split('?');
+					var newurl;
+					if (arr.length > 1 && arr[1] !== '') {
+						newurl = window.location.href + '&' + param;
+					} else {
+						newurl = window.location.href + '?' + param;
+					}
+					window.history.pushState({ path:newurl }, '', newurl);
+				}
+			} else if (force) {
+				if (history.pushState) {
+					var href = new URL(window.location.href);
+					if (para.length == 1) {
+						href.searchParams.set(para[0].toLowerCase(), "");
+					} else {
+						href.searchParams.set(para[0].toLowerCase(), para[1]);
+					}
+					window.history.pushState({ path:href.toString() }, '', href.toString());
+				}
+			}
+		}
 
-    function getLanguageName(code){
-      return code === "it-IT" || code === "it" ? "Italian" : "English";
-    }
+		(function (w) {
+			w.URLSearchParams = w.URLSearchParams || function (searchString) {
+				var self = this;
+				self.searchString = searchString;
+				self.get = function (name) {
+					var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(self.searchString);
+					if (results == null) return null;
+					return decodeURI(results[1]) || 0;
+				};
+			};
+		})(window);
 
-    function getBaseFolder(){
-      const url = new URL(window.location.href);
-      return url.origin + url.pathname.replace(/\/[^/]*$/, "/");
-    }
+		var urlParams = new URLSearchParams(window.location.search);
+		var textRulesConfig = (window.CaptionTextRules && window.CaptionTextRules.parseRulesFromUrlParams)
+			? window.CaptionTextRules.parseRulesFromUrlParams(urlParams)
+			: { replacements: [], restricted: [], matchMode: 'phonetic' };
+		var textRulesEngine = (window.CaptionTextRules && window.CaptionTextRules.createEngine)
+			? window.CaptionTextRules.createEngine(textRulesConfig)
+			: null;
 
-    function buildOverlayUrl(){
-      const params = new URLSearchParams({
-        room: state.roomID,
-        translate: getTargetLanguage(),
-        dual: "1",
-        maxlines: "4",
-        
+		function applyTextRules(text) {
+			if (!textRulesEngine || typeof text !== 'string') return text;
+			try {
+				return textRulesEngine.apply(text);
+			} catch (e) {
+				console.warn('Text rules failed:', e);
+				return text;
+			}
+		}
+
+		function sanitize(string) {
+			var temp = document.createElement('div');
+			temp.textContent = string;
+			let text = temp.textContent.substring(0, Math.min(temp.textContent.length, 500)).trim();
+			const isRTL = /[\u0591-\u07FF\u200F\u202B\u202E\uFB1D-\uFDFD\uFE70-\uFEFC]/.test(text);
+			if (isRTL) text = text.replaceAll(/[.,!?،؟؛]/g, " ");
+			return applyTextRules(text);
+		}
+
+		function escapeHTML(text) {
+			return String(text)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;');
+		}
+
+		function generateSecureRoomID(len = 16) {
+			const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+			let out = '';
+			const cryptoObj = window.crypto || window.msCrypto;
+			if (cryptoObj && typeof cryptoObj.getRandomValues === "function") {
+				const randomValues = new Uint8Array(len);
+				cryptoObj.getRandomValues(randomValues);
+				for (let i = 0; i < len; i++) out += chars.charAt(randomValues[i] % chars.length);
+				return out;
+			}
+			for (let i = 0; i < len; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
+			return out;
+		}
+
+		var roomID = "test";
+		let storedRoom = "";
+		try { storedRoom = localStorage.getItem('cn_room_id') || ""; } catch (e) {}
+
+		if (urlParams.has("room")) {
+			roomID = urlParams.get("room");
+		} else if (urlParams.has("ROOM")) {
+			roomID = urlParams.get("ROOM");
+		} else if (storedRoom && /^[A-Za-z0-9]{12,}$/.test(storedRoom)) {
+			roomID = storedRoom;
+			updateURL("room=" + roomID);
+		} else {
+			roomID = generateSecureRoomID(16);
+			updateURL("room=" + roomID);
+		}
+
+		try { localStorage.setItem('cn_room_id', roomID); } catch (e) {}
+
+		if (typeof isInsecureStreamId === "function" && isInsecureStreamId(roomID)) {
+			if (typeof injectSecurityStyles === "function") injectSecurityStyles();
+			if (typeof showSecurityWarning === "function") {
+				showSecurityWarning(
+					'Warning: You are using an insecure room ID that could be easily guessed. Consider using a more secure ID for privacy.',
+					0
+				);
+			}
+		}
+
+		var label = false;
+		if (urlParams.has("label")) label = urlParams.get("label");
+
+		var myLang = "en-US";
+		if (urlParams.has("lang")) {
+			myLang = urlParams.get("lang");
+		} else {
+			updateURL("lang=" + myLang);
+		}
+
+		if (myLang !== "en-US" && myLang !== "it-IT") {
+			myLang = "en-US";
+			updateURL("lang=" + myLang, true);
+		}
+
+		var toggleLanguages = ["en-US", "it-IT"];
+		var currentLangIndex = toggleLanguages.indexOf(myLang);
+		if (currentLangIndex === -1) {
+			currentLangIndex = 0;
+			myLang = toggleLanguages[0];
+			updateURL("lang=" + myLang, true);
+		}
+
+		var langToggleContainer = document.getElementById("langToggleContainer");
+		var langToggleBtn = document.getElementById("langToggleBtn");
+		var langToggleCurrent = document.getElementById("langToggleCurrent");
+
+		function updateToggleDisplay() {
+			var displayCode = myLang.split("-")[0].toUpperCase();
+			langToggleCurrent.textContent = displayCode;
+			langToggleBtn.title = "Current: " + myLang + " - Click or Ctrl+L to switch";
+		}
+
+		function switchLanguage() {
+			currentLangIndex = (currentLangIndex + 1) % toggleLanguages.length;
+			myLang = toggleLanguages[currentLangIndex];
+			updateURL("lang=" + myLang, true);
+			updateToggleDisplay();
+			if (recognition) {
+				recognition.lang = myLang;
+				try { recognition.stop(); } catch(e) {}
+			}
+			updateShareLinks();
+		}
+
+		updateToggleDisplay();
+		langToggleBtn.addEventListener("click", switchLanguage);
+
+		document.addEventListener("keydown", function(e) {
+			if (e.ctrlKey && e.key.toLowerCase() === "l") {
+				e.preventDefault();
+				switchLanguage();
+			}
+		});
+
+		var srtFile = "";
+		var timestamp_start = null;
+		var timestamp_stop = null;
+		var timestamp_intern = null;
+		var logcounter = 0;
+		var lastStopMs = 0;
+		var srtCues = [];
+		var MIN_CUE_MS = 500;
+		var counter = 0;
+		var url = document.URL.substr(0, document.URL.lastIndexOf('/'));
+
+		function formatSrtTime(ms) {
+			var t = Math.max(0, Math.floor(ms));
+			var hh = Math.floor(t / 3600000); t -= hh * 3600000;
+			var mm = Math.floor(t / 60000); t -= mm * 60000;
+			var ss = Math.floor(t / 1000); t -= ss * 1000;
+			var ms3 = t;
+			function pad(n, len) { n = String(n); while (n.length < len) n = '0' + n; return n; }
+			return pad(hh,2) + ':' + pad(mm,2) + ':' + pad(ss,2) + ',' + pad(ms3,3);
+		}
+
+		function rebuildSrtFile() {
+			var out = "";
+			for (var i = 0; i < srtCues.length; i++) {
+				var c = srtCues[i];
+				var start = Math.max(0, c.startMs|0);
+				var end = Math.max(start, c.endMs|0);
+				var nextStart = (i+1 < srtCues.length) ? Math.max(0, srtCues[i+1].startMs|0) : null;
+				var desiredEnd = Math.max(end, start + MIN_CUE_MS);
+				if (nextStart !== null && desiredEnd > nextStart) {
+					end = nextStart;
+				} else {
+					end = desiredEnd;
+				}
+				out += (i+1) + "\n";
+				out += formatSrtTime(start) + " --> " + formatSrtTime(end) + "\n";
+				out += ">> " + c.text + "\n\n";
+			}
+			srtFile = out;
+		}
+
+		function getTargetTranslateLang() {
+			return myLang === "it-IT" ? "en" : "it";
+		}
+
+		function buildOverlayUrl() {
+			const params = new URLSearchParams();
+			params.set("room", roomID);
+			params.set("translate", getTargetTranslateLang());
+			params.set("dual", "1");
+			params.set("maxlines", "4");
+			params.set("showtime", "15000");
+			params.set("interimmaxlines", "3");
+			return url + "/overlay.html?" + params.toString();
+		}
+
+		function updateShareLinks() {
+			const overlayShareLink = buildOverlayUrl();
+			const shareLinkEl = document.getElementById("shareLink");
+			shareLinkEl.href = overlayShareLink;
+			shareLinkEl.textContent = overlayShareLink;
+		}
+
+		updateShareLinks();
+
+		var oldSaves = [];
+		try { oldSaves = Object.keys(localStorage); } catch(e) {}
+
+		if (oldSaves.length) {
+			for (var i = 0; i < oldSaves.length; i++) {
+				if (oldSaves.length - 1 == i) {
+					if (oldSaves[i].startsWith("transcription_" + roomID + "_")) {
+						try {
+							var button = document.createElement("button");
+							button.onclick = function() {
+								var srtFile = getStorage(this.dataset.key);
+								download(this.dataset.key + ".srt", srtFile);
+								localStorage.removeItem(this.dataset.key);
+							};
+							button.dataset.key = oldSaves[i];
+							button.innerHTML = "Download previous saved transcription";
+							document.body.prepend(button);
+						} catch(e) { console.error(e); }
+					}
+				} else if (oldSaves[i].startsWith("transcription_" + roomID + "_")) {
+					localStorage.removeItem(i);
+				}
+			}
+		}
+
+		var recognition = null;
+		var wsPublisher = null;
+
+		function publishCaption(msgObj) {
+			try {
+				if (wsPublisher && typeof wsPublisher.publish === "function") {
+					wsPublisher.publish(msgObj);
+				}
+			} catch(e) {
+				console.error(e);
+			}
+		}
+
+		function createControlButtons() {
+			if (document.getElementById("cnControls")) return;
+
+			var controlContainer = document.createElement("div");
+			controlContainer.id = "cnControls";
+			controlContainer.className = "control-buttons";
+
+			var downloadButton = document.createElement("button");
+			downloadButton.innerHTML = "Download SRT";
+			downloadButton.className = "control-button";
+			downloadButton.onclick = function() {
+				rebuildSrtFile();
+				download("buoninglese-live.srt", srtFile);
+			};
+
+			var shareButton = document.createElement("button");
+			shareButton.innerHTML = "Copy Overlay Link";
+			shareButton.className = "control-button";
+			shareButton.onclick = function() {
+				const overlayUrl = buildOverlayUrl();
+				navigator.clipboard.writeText(overlayUrl).then(() => {
+					shareButton.innerHTML = "Overlay Link Copied!";
+					setTimeout(() => shareButton.innerHTML = "Copy Overlay Link", 2000);
+				}).catch(() => {
+					showError("Could not copy overlay link.");
+				});
+			};
+
+			var framerButton = document.createElement("button");
+			framerButton.innerHTML = "Copy Framer Embed";
+			framerButton.className = "control-button";
+			framerButton.onclick = function() {
+				const iframeCode = '<iframe src="' + buildOverlayUrl() + '" width="100%" height="650" style="border:0;" allow="microphone"></iframe>';
+				navigator.clipboard.writeText(iframeCode).then(() => {
+					framerButton.innerHTML = "Framer Embed Copied!";
+					setTimeout(() => framerButton.innerHTML = "Copy Framer Embed", 2000);
+				}).catch(() => {
+					showError("Could not copy Framer embed code.");
+				});
+			};
+
+			toggleButton.classList.remove("hidden");
+
+			controlContainer.appendChild(downloadButton);
+			controlContainer.appendChild(shareButton);
+			controlContainer.appendChild(framerButton);
+			controlContainer.appendChild(toggleButton);
+
+			document.body.appendChild(controlContainer);
+		}
+
+		function connectWebSocket() {
+			try {
+				wsPublisher = createWSPublisher({
+					url: "wss://api.caption.ninja:443",
+					room: roomID,
+					onStateChange: function() {},
+					onError: function(error) {
+						console.error("WebSocket error:", error);
+					}
+				});
+				if (wsPublisher && typeof wsPublisher.connect === "function") {
+					wsPublisher.connect();
+				}
+			} catch (e) {
+				console.error(e);
+				showError("Could not connect to the websocket server.");
+			}
+		}
+
+		connectWebSocket();
+
+		var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+		if (!SpeechRecognition) {
+			showError("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
+		} else {
+			recognition = new SpeechRecognition();
+			recognition.continuous = true;
+			recognition.interimResults = true;
+			recognition.lang = myLang;
+
+			let pendingInterim = "";
+
+			recognition.onresult = function(event) {
+				document.getElementById("interm").innerHTML = "";
+				let interimTranscript = "";
+
+				for (let i = event.resultIndex; i < event.results.length; ++i) {
+					let transcript = sanitize(event.results[i][0].transcript);
+					if (!transcript) continue;
+
+					if (event.results[i].isFinal) {
+						counter += 1;
+						const direction = detectTextDirection(transcript);
+						document.getElementById("output").innerHTML += "<span id='final_" + counter + "' dir='" + direction + "'>" + escapeHTML(transcript) + "</span><br />";
+						publishCaption({"msg": true, "final": transcript, "id": counter, "ln": myLang});
+						pendingInterim = "";
+						createControlButtons();
+
+						if (window.CAPTION_TTS && typeof window.CAPTION_TTS.speak === "function") {
+							window.CAPTION_TTS.speak(transcript);
+						}
+
+						let now = Date.now();
+						if (timestamp_start === null) timestamp_start = now;
+						timestamp_stop = now;
+						srtCues.push({
+							startMs: Math.max(0, lastStopMs),
+							endMs: Math.max(0, now - timestamp_start),
+							text: transcript
+						});
+						lastStopMs = Math.max(0, now - timestamp_start);
+						rebuildSrtFile();
+					} else {
+						interimTranscript += " " + transcript;
+					}
+				}
+
+				interimTranscript = interimTranscript.trim();
+				if (interimTranscript) {
+					pendingInterim = interimTranscript;
+					const direction = detectTextDirection(interimTranscript);
+					document.getElementById("interm").innerHTML =
+						"<span dir='" + direction + "'>" + escapeHTML(interimTranscript) + "</span>";
+					publishCaption({"msg": true, "interm": interimTranscript, "id": counter, "ln": myLang});
+				}
+			};
+
+			recognition.onerror = function(event) {
+				console.error("Recognition error:", event.error);
+				showError("Speech recognition error: " + event.error);
+			};
+
+			recognition.onend = function() {
+				if (!isPaused) {
+					try {
+						recognition.lang = myLang;
+						recognition.start();
+					} catch (e) {
+						console.error(e);
+					}
+				}
+			};
+
+			navigator.mediaDevices.getUserMedia({ audio: true }).then(function() {
+				try {
+					recognition.start();
+				} catch (e) {
+					console.error(e);
+					showError("Could not start speech recognition.");
+				}
+			}).catch(function(err) {
+				console.error(err);
+				showError("Microphone permission was denied or unavailable.");
+			});
+		}
+	</script>
+</body>
+</html>
