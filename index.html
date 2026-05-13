@@ -20,15 +20,19 @@
 		}
 
 		:root {
-			--primary-color: #2498eb;
-			--secondary-color: #1e293b;
-			--background-color: #0000;
-			--text-color: #333;
-			--border-radius: 6px;
-			--cc-background: #000000;
-			--cc-text-color: #ffffff;
-			--cc-font-size: 24px;
-			--cc-line-height: 1.2;
+			--bg-1: #07111f;
+			--bg-2: #0d1c2f;
+			--panel: rgba(7, 17, 31, 0.88);
+			--panel-2: rgba(12, 27, 46, 0.94);
+			--line: rgba(111, 168, 255, 0.18);
+			--text: #e8f1ff;
+			--muted: #9fb6d8;
+			--primary: #2498eb;
+			--primary-2: #4fb6ff;
+			--danger: #dc3545;
+			--success: #1fbf75;
+			--shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+			--radius: 18px;
 		}
 
 		* {
@@ -38,215 +42,406 @@
 		html, body {
 			margin: 0;
 			padding: 0;
-			width: 100%;
-			height: 100%;
-			background: transparent;
+			min-height: 100%;
+			font-family: Inter, Arial, sans-serif;
+			background:
+				radial-gradient(circle at top left, rgba(36, 152, 235, 0.16), transparent 30%),
+				radial-gradient(circle at bottom right, rgba(79, 182, 255, 0.12), transparent 26%),
+				linear-gradient(180deg, var(--bg-1) 0%, #050c16 100%);
+			color: var(--text);
 		}
 
 		body {
-			padding: 0 10px;
-			height: 100%;
-			border: 0;
-			display: flex;
-			flex-direction: column-reverse;
-			position: absolute;
-			bottom: 0;
-			overflow: hidden;
-			max-width: calc(100vw - 20px);
-			font-family: Arial, sans-serif;
+			padding: 28px;
+		}
+
+		a {
+			color: var(--primary-2);
+			text-decoration: none;
+			word-break: break-all;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+
+		button {
+			font: inherit;
 		}
 
 		.hidden {
 			display: none !important;
 		}
 
-		.output {
+		.page-shell {
+			max-width: 1280px;
+			margin: 0 auto;
+			display: grid;
+			grid-template-columns: minmax(360px, 520px) minmax(420px, 1fr);
+			gap: 24px;
+			align-items: start;
+		}
+
+		.brand-panel,
+		.live-panel {
+			background: linear-gradient(180deg, rgba(14, 30, 50, 0.98) 0%, rgba(7, 17, 31, 0.96) 100%);
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(12px);
+		}
+
+		.brand-panel {
+			padding: 28px;
+			position: sticky;
+			top: 28px;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 12px;
+			border-radius: 999px;
+			background: rgba(36, 152, 235, 0.12);
+			border: 1px solid rgba(79, 182, 255, 0.25);
+			color: #cfe7ff;
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			margin-bottom: 18px;
+		}
+
+		.brand-title {
+			font-size: clamp(2rem, 3vw, 3.4rem);
+			line-height: 0.95;
+			margin: 0 0 14px;
+			letter-spacing: -0.04em;
+		}
+
+		.brand-title span {
+			display: block;
+			color: var(--primary-2);
+		}
+
+		.brand-copy {
+			color: var(--muted);
+			font-size: 1rem;
+			line-height: 1.6;
+			margin-bottom: 22px;
+			max-width: 42ch;
+		}
+
+		.info-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 12px;
+			margin: 22px 0 24px;
+		}
+
+		.info-card {
+			background: rgba(255, 255, 255, 0.03);
+			border: 1px solid rgba(111, 168, 255, 0.12);
+			border-radius: 16px;
+			padding: 14px 14px 12px;
+		}
+
+		.info-card-label {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: #8ea7cc;
+			margin-bottom: 8px;
+		}
+
+		.info-card-value {
+			font-size: 15px;
+			font-weight: 700;
+			color: #edf5ff;
+			line-height: 1.35;
+		}
+
+		.steps,
+		.tips {
 			margin: 0;
-			background-color: #0000;
+			padding-left: 18px;
+			color: var(--muted);
+			line-height: 1.65;
+		}
+
+		.section-title {
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: #cfe2ff;
+			margin: 24px 0 10px;
+		}
+
+		.share-box {
+			margin-top: 20px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(111, 168, 255, 0.12);
+			border-radius: 14px;
+			padding: 14px 16px;
+		}
+
+		.share-box strong {
+			display: block;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			margin-bottom: 8px;
+			color: #d5e7ff;
+		}
+
+		.live-panel {
+			padding: 20px;
+			min-height: calc(100vh - 56px);
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+		}
+
+		.topbar {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 14px;
+			padding-bottom: 14px;
+			border-bottom: 1px solid rgba(111, 168, 255, 0.12);
+		}
+
+		.topbar-left {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.source-wrap {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 12px;
+			border-radius: 12px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(111, 168, 255, 0.12);
+		}
+
+		.source-label {
+			color: #9fb6d8;
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+		}
+
+		.lang-toggle-btn {
+			background: linear-gradient(180deg, #2aa3ff 0%, #1d7fcc 100%);
 			color: white;
-			font-family: Cousine, monospace;
-			font-size: 3.2em;
-			line-height: 1.1em;
-			letter-spacing: 0;
-			padding: 0;
-			text-shadow: 0.05em 0.05em 0 rgba(0,0,0,1);
-			direction: auto;
-			unicode-bidi: bidi-override;
+			border: 0;
+			padding: 10px 16px;
+			border-radius: 12px;
+			cursor: pointer;
+			font-weight: 800;
+			font-size: 14px;
+			letter-spacing: 0.04em;
+			min-width: 72px;
+			box-shadow: 0 10px 24px rgba(36, 152, 235, 0.22);
 		}
 
-		.output span {
-			background-color: black;
-			padding: 8px 8px 0 8px;
-			margin: 0;
-			display: inline-block;
-			direction: inherit;
-			text-align: start;
-			max-width: 100%;
+		.lang-toggle-btn:hover {
+			filter: brightness(1.06);
 		}
 
-		a {
-			color: white;
-			font-size: 1.1em;
-			text-transform: none;
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 12px;
+			border-radius: 12px;
+			background: rgba(31, 191, 117, 0.09);
+			border: 1px solid rgba(31, 191, 117, 0.2);
+			color: #bcf4d8;
+			font-size: 13px;
+			font-weight: 700;
 		}
 
-		.small-text-container {
-			background-color: black;
-			padding: 10px;
-			margin-top: 10px;
+		.status-dot {
+			width: 10px;
+			height: 10px;
+			border-radius: 999px;
+			background: #1fbf75;
+			box-shadow: 0 0 0 6px rgba(31, 191, 117, 0.12);
 		}
 
 		.control-buttons {
-			position: fixed;
-			top: 10px;
-			left: 10px;
-			right: 10px;
 			display: flex;
 			flex-wrap: wrap;
-			justify-content: flex-start;
 			gap: 10px;
-			z-index: 2000;
 		}
 
 		.control-button {
-			background-color: var(--primary-color);
-			color: white;
-			border: none;
-			padding: 10px 16px;
-			border-radius: var(--border-radius);
+			background: rgba(255, 255, 255, 0.05);
+			color: #eef6ff;
+			border: 1px solid rgba(111, 168, 255, 0.14);
+			padding: 10px 14px;
+			border-radius: 12px;
 			cursor: pointer;
-			font-weight: bold;
-			transition: background-color 0.25s ease, transform 0.1s ease;
+			font-weight: 700;
 			font-size: 14px;
 		}
 
 		.control-button:hover {
-			background-color: var(--secondary-color);
-		}
-
-		.control-button:active {
-			transform: scale(0.98);
+			background: rgba(36, 152, 235, 0.12);
+			border-color: rgba(79, 182, 255, 0.28);
 		}
 
 		.control-button.paused {
-			background-color: #dc3545;
+			background: rgba(220, 53, 69, 0.14);
+			border-color: rgba(220, 53, 69, 0.32);
+			color: #ffd9de;
 		}
 
-		.lang-toggle-container {
-			position: fixed;
-			top: 10px;
-			left: 10px;
-			z-index: 1000;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			background: rgba(0, 0, 0, 0.85);
-			padding: 8px 12px;
-			border-radius: 6px;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		.caption-shell {
+			display: grid;
+			grid-template-rows: auto 1fr;
+			gap: 14px;
+			flex: 1;
+			min-height: 0;
 		}
 
-		.lang-toggle-label {
-			color: #9aa3b2;
+		.interim-box,
+		.output-box {
+			border-radius: 16px;
+			border: 1px solid rgba(111, 168, 255, 0.12);
+			background: rgba(255, 255, 255, 0.03);
+			overflow: hidden;
+		}
+
+		.box-header {
+			padding: 12px 16px;
+			border-bottom: 1px solid rgba(111, 168, 255, 0.1);
 			font-size: 11px;
 			text-transform: uppercase;
-			letter-spacing: 0.5px;
+			letter-spacing: 0.08em;
+			color: #9fb6d8;
+			background: rgba(255, 255, 255, 0.025);
 		}
 
-		.lang-toggle-btn {
-			background: var(--primary-color);
+		.output {
+			margin: 0;
 			color: white;
-			border: none;
-			padding: 8px 16px;
-			border-radius: 4px;
-			cursor: pointer;
-			font-weight: 600;
-			font-size: 14px;
-			transition: background-color 0.2s, transform 0.1s;
-			min-width: 60px;
-			text-align: center;
+			font-family: Cousine, monospace;
+			letter-spacing: 0;
+			padding: 16px;
+			direction: auto;
+			unicode-bidi: bidi-override;
+			overflow-wrap: anywhere;
 		}
 
-		.lang-toggle-btn:hover {
-			background: #1d7acc;
+		#interm.output {
+			font-size: clamp(1rem, 1.5vw, 1.35rem);
+			line-height: 1.45;
+			min-height: 92px;
+			color: #dcecff;
 		}
 
-		.lang-toggle-btn:active {
-			transform: scale(0.98);
+		#output.output {
+			font-size: clamp(1.25rem, 2vw, 2.15rem);
+			line-height: 1.35;
+			min-height: 360px;
+			max-height: 58vh;
+			overflow-y: auto;
 		}
 
-		.lang-toggle-shortcut {
-			color: #6b7280;
-			font-size: 10px;
-			margin-left: 4px;
+		.output span {
+			display: inline-block;
+			background: rgba(0, 0, 0, 0.56);
+			border: 1px solid rgba(111, 168, 255, 0.08);
+			padding: 8px 10px 4px;
+			border-radius: 10px;
+			margin-bottom: 8px;
+			max-width: 100%;
 		}
 
 		.error-banner {
+			display: none;
 			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
+			top: 18px;
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 10000;
 			background-color: #dc3545;
 			color: white;
-			padding: 10px;
-			text-align: center;
-			z-index: 10000;
-			font-size: 16px;
-			display: none;
+			padding: 12px 14px;
+			border-radius: 12px;
+			box-shadow: 0 10px 26px rgba(0,0,0,0.25);
 		}
 
 		.error-banner button {
+			margin-left: 10px;
 			background-color: white;
 			color: #dc3545;
 			border: none;
-			padding: 5px 10px;
-			margin-left: 10px;
-			border-radius: 4px;
+			padding: 6px 10px;
+			border-radius: 8px;
 			cursor: pointer;
+			font-weight: 700;
 		}
 
-		@media (max-width: 768px) {
-			.small-text-container {
-				padding: 5px;
-				margin-top: 5px;
+		@media (max-width: 1080px) {
+			.page-shell {
+				grid-template-columns: 1fr;
 			}
 
-			.output {
-				font-size: 2.2em;
-				line-height: 1em;
-				text-shadow: 0.03em 0.03em 0 rgba(0,0,0,1);
+			.brand-panel {
+				position: relative;
+				top: auto;
 			}
 
-			.output span {
-				padding: 5px 5px 0 5px;
+			.live-panel {
+				min-height: auto;
 			}
 
+			#output.output {
+				max-height: 48vh;
+			}
+		}
+
+		@media (max-width: 640px) {
 			body {
-				padding: 0 5px;
-				max-width: calc(100vw - 10px);
+				padding: 14px;
 			}
 
-			.control-button {
-				padding: 8px 12px;
-				font-size: 14px;
+			.brand-panel,
+			.live-panel {
+				padding: 16px;
+				border-radius: 16px;
 			}
 
-			ol, ul {
-				padding-left: 20px;
+			.info-grid {
+				grid-template-columns: 1fr;
 			}
 
-			.small-text-container font {
-				font-size: 40% !important;
-			}
-		}
-
-		@media (max-width: 480px) {
-			.output {
-				font-size: 1.6em;
+			.topbar {
+				align-items: flex-start;
 			}
 
-			.small-text-container font {
-				font-size: 50% !important;
+			.topbar-left,
+			.control-buttons {
+				width: 100%;
+			}
+
+			.control-button,
+			.lang-toggle-btn {
+				width: 100%;
+			}
+
+			#output.output {
+				font-size: 1.1rem;
+				max-height: 44vh;
 			}
 		}
 	</style>
@@ -257,49 +452,92 @@
 		<button id="dismissError">Dismiss</button>
 	</div>
 
-	<div id="langToggleContainer" class="lang-toggle-container">
-		<span class="lang-toggle-label">Source:</span>
-		<button id="langToggleBtn" class="lang-toggle-btn" title="Switch source language (Ctrl+L)">
-			<span id="langToggleCurrent" class="lang-code">EN</span>
-		</button>
-		<span class="lang-toggle-shortcut">Ctrl+L</span>
+	<div class="page-shell">
+		<aside class="brand-panel">
+			<div class="eyebrow">Buon Inglese • Live Tool</div>
+			<h1 class="brand-title">Live captions for <span>English ↔ Italian</span></h1>
+			<p class="brand-copy">
+				A cleaner version of your caption tool for classes, speaking practice, tutoring, and bilingual conversation support.
+				It only uses English and Italian, and the overlay automatically shows the opposite language.
+			</p>
+
+			<div class="info-grid">
+				<div class="info-card">
+					<div class="info-card-label">Source language</div>
+					<div class="info-card-value">English or Italian only</div>
+				</div>
+				<div class="info-card">
+					<div class="info-card-label">Target language</div>
+					<div class="info-card-value">Automatic opposite translation</div>
+				</div>
+				<div class="info-card">
+					<div class="info-card-label">Best browser</div>
+					<div class="info-card-value">Chrome or Edge</div>
+				</div>
+				<div class="info-card">
+					<div class="info-card-label">Use case</div>
+					<div class="info-card-value">Lessons, calls, practice, accessibility</div>
+				</div>
+			</div>
+
+			<h2 class="section-title">How it works</h2>
+			<ol class="steps">
+				<li>Allow microphone access.</li>
+				<li>Choose the source language using the EN/IT toggle.</li>
+				<li>Speak naturally and watch the captions appear live.</li>
+				<li>Open the overlay link to display the bilingual output.</li>
+			</ol>
+
+			<h2 class="section-title">Notes</h2>
+			<ul class="tips">
+				<li>This version is locked to English and Italian only.</li>
+				<li>English speech produces Italian translation in the overlay.</li>
+				<li>Italian speech produces English translation in the overlay.</li>
+				<li>You can download an SRT transcript or copy a Framer embed snippet.</li>
+			</ul>
+
+			<div class="share-box">
+				<strong>Overlay link</strong>
+				<a id="shareLink" href="overlay.html" target="_blank" rel="noopener noreferrer">*ERROR GENERATING LINK*</a>
+			</div>
+		</aside>
+
+		<main class="live-panel">
+			<div class="topbar">
+				<div class="topbar-left">
+					<div class="source-wrap">
+						<span class="source-label">Source</span>
+						<button id="langToggleBtn" class="lang-toggle-btn" title="Switch source language (Ctrl+L)">
+							<span id="langToggleCurrent">EN</span>
+						</button>
+					</div>
+
+					<div class="status-pill">
+						<span class="status-dot"></span>
+						<span>Live capture ready</span>
+					</div>
+				</div>
+
+				<div id="cnControls" class="control-buttons">
+					<button id="toggleTranscription" class="hidden control-button">Pause Transcription</button>
+				</div>
+			</div>
+
+			<div class="caption-shell">
+				<section class="interim-box">
+					<div class="box-header">Listening now</div>
+					<div id="interm" class="output">
+						<span>Waiting for microphone input…</span>
+					</div>
+				</section>
+
+				<section class="output-box">
+					<div class="box-header">Transcript</div>
+					<div id="output" class="output"></div>
+				</section>
+			</div>
+		</main>
 	</div>
-
-	<div id="interm" class="output">
-		<font style="font-size:60%;line-height: 1.4em;"><span>Welcome to Buon Inglese Live</span></font>
-
-		<div class="small-text-container">
-			<font style="font-size:30%;line-height: 1.4em;">
-				<span>
-					<br />
-					<strong>📖 BUON INGLESE LIVE:</strong>
-					<ol>
-						<li>Accept the microphone permissions when prompted.</li>
-						<li>Start speaking and your words will appear as captions.</li>
-						<li>Use the language toggle to switch between English and Italian.</li>
-						<li><a id="shareLink" href="overlay.html" target="_blank" rel="noopener noreferrer">*ERROR GENERATING LINK*</a></li>
-					</ol>
-
-					<strong>💡 Tips:</strong>
-					<ul>
-						<li>Use Google Chrome or Microsoft Edge for best results.</li>
-						<li>To save the transcription: Select all, copy, and paste into a text editor.</li>
-					</ul>
-
-					<strong>🌐 Translation:</strong>
-					<ul>
-						<li>This version is locked to English and Italian only.</li>
-						<li>The overlay automatically translates to the opposite language.</li>
-						<li>English source gives Italian translation; Italian source gives English translation.</li>
-					</ul>
-				</span>
-			</font>
-		</div>
-		<br />
-	</div>
-
-	<div id="output" class="output"></div>
-	<button id="toggleTranscription" class="hidden control-button">Pause Transcription</button>
 
 	<script src="security-utils.js"></script>
 	<script src="tts-integration.js"></script>
@@ -506,9 +744,6 @@
 			}
 		}
 
-		var label = false;
-		if (urlParams.has("label")) label = urlParams.get("label");
-
 		var myLang = "en-US";
 		if (urlParams.has("lang")) {
 			myLang = urlParams.get("lang");
@@ -529,7 +764,6 @@
 			updateURL("lang=" + myLang, true);
 		}
 
-		var langToggleContainer = document.getElementById("langToggleContainer");
 		var langToggleBtn = document.getElementById("langToggleBtn");
 		var langToggleCurrent = document.getElementById("langToggleCurrent");
 
@@ -564,8 +798,6 @@
 		var srtFile = "";
 		var timestamp_start = null;
 		var timestamp_stop = null;
-		var timestamp_intern = null;
-		var logcounter = 0;
 		var lastStopMs = 0;
 		var srtCues = [];
 		var MIN_CUE_MS = 500;
@@ -626,31 +858,6 @@
 
 		updateShareLinks();
 
-		var oldSaves = [];
-		try { oldSaves = Object.keys(localStorage); } catch(e) {}
-
-		if (oldSaves.length) {
-			for (var i = 0; i < oldSaves.length; i++) {
-				if (oldSaves.length - 1 == i) {
-					if (oldSaves[i].startsWith("transcription_" + roomID + "_")) {
-						try {
-							var button = document.createElement("button");
-							button.onclick = function() {
-								var srtFile = getStorage(this.dataset.key);
-								download(this.dataset.key + ".srt", srtFile);
-								localStorage.removeItem(this.dataset.key);
-							};
-							button.dataset.key = oldSaves[i];
-							button.innerHTML = "Download previous saved transcription";
-							document.body.prepend(button);
-						} catch(e) { console.error(e); }
-					}
-				} else if (oldSaves[i].startsWith("transcription_" + roomID + "_")) {
-					localStorage.removeItem(i);
-				}
-			}
-		}
-
 		var recognition = null;
 		var wsPublisher = null;
 
@@ -665,11 +872,10 @@
 		}
 
 		function createControlButtons() {
-			if (document.getElementById("cnControls")) return;
+			const controlContainer = document.getElementById("cnControls");
 
-			var controlContainer = document.createElement("div");
-			controlContainer.id = "cnControls";
-			controlContainer.className = "control-buttons";
+			if (controlContainer.dataset.enhanced === "1") return;
+			controlContainer.dataset.enhanced = "1";
 
 			var downloadButton = document.createElement("button");
 			downloadButton.innerHTML = "Download SRT";
@@ -707,12 +913,9 @@
 
 			toggleButton.classList.remove("hidden");
 
-			controlContainer.appendChild(downloadButton);
-			controlContainer.appendChild(shareButton);
-			controlContainer.appendChild(framerButton);
-			controlContainer.appendChild(toggleButton);
-
-			document.body.appendChild(controlContainer);
+			controlContainer.prepend(downloadButton);
+			controlContainer.prepend(shareButton);
+			controlContainer.prepend(framerButton);
 		}
 
 		function connectWebSocket() {
@@ -746,12 +949,8 @@
 			recognition.interimResults = true;
 			recognition.lang = myLang;
 
-			let pendingInterim = "";
-
 			recognition.onresult = function(event) {
-				document.getElementById("interm").innerHTML = "";
 				let interimTranscript = "";
-
 				for (let i = event.resultIndex; i < event.results.length; ++i) {
 					let transcript = sanitize(event.results[i][0].transcript);
 					if (!transcript) continue;
@@ -761,7 +960,6 @@
 						const direction = detectTextDirection(transcript);
 						document.getElementById("output").innerHTML += "<span id='final_" + counter + "' dir='" + direction + "'>" + escapeHTML(transcript) + "</span><br />";
 						publishCaption({"msg": true, "final": transcript, "id": counter, "ln": myLang});
-						pendingInterim = "";
 						createControlButtons();
 
 						if (window.CAPTION_TTS && typeof window.CAPTION_TTS.speak === "function") {
@@ -778,6 +976,8 @@
 						});
 						lastStopMs = Math.max(0, now - timestamp_start);
 						rebuildSrtFile();
+
+						document.getElementById("interm").innerHTML = "<span>Listening now…</span>";
 					} else {
 						interimTranscript += " " + transcript;
 					}
@@ -785,7 +985,6 @@
 
 				interimTranscript = interimTranscript.trim();
 				if (interimTranscript) {
-					pendingInterim = interimTranscript;
 					const direction = detectTextDirection(interimTranscript);
 					document.getElementById("interm").innerHTML =
 						"<span dir='" + direction + "'>" + escapeHTML(interimTranscript) + "</span>";
