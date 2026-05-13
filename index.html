@@ -7,7 +7,7 @@
 
 	<title>Buon Inglese Live Captions</title>
 	<meta name="title" content="Buon Inglese Live Captions" />
-	<meta name="description" content="Live English-Italian captions and translation for Buon Inglese." />
+	<meta name="description" content="Live English-Italian captions, lessons, and tools for Buon Inglese." />
 	<meta name="robots" content="index, follow" />
 
 	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -25,11 +25,11 @@
 			--panel: rgba(7, 17, 31, 0.88);
 			--panel-2: rgba(12, 27, 46, 0.94);
 			--line: rgba(111, 168, 255, 0.18);
+			--line-strong: rgba(111, 168, 255, 0.32);
 			--text: #e8f1ff;
 			--muted: #9fb6d8;
 			--primary: #2498eb;
 			--primary-2: #4fb6ff;
-			--danger: #dc3545;
 			--success: #1fbf75;
 			--shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 			--radius: 18px;
@@ -73,15 +73,16 @@
 			display: none !important;
 		}
 
-		.page-shell {
+		.site-wrap {
 			max-width: 1280px;
 			margin: 0 auto;
-			display: grid;
-			grid-template-columns: minmax(360px, 520px) minmax(420px, 1fr);
+			display: flex;
+			flex-direction: column;
 			gap: 24px;
-			align-items: start;
 		}
 
+		.hero-panel,
+		.modular-panel,
 		.brand-panel,
 		.live-panel {
 			background: linear-gradient(180deg, rgba(14, 30, 50, 0.98) 0%, rgba(7, 17, 31, 0.96) 100%);
@@ -89,6 +90,192 @@
 			border-radius: var(--radius);
 			box-shadow: var(--shadow);
 			backdrop-filter: blur(12px);
+		}
+
+		.hero-panel {
+			padding: 30px 32px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.hero-panel::after {
+			content: "";
+			position: absolute;
+			inset: auto -80px -80px auto;
+			width: 240px;
+			height: 240px;
+			background: radial-gradient(circle, rgba(79, 182, 255, 0.18) 0%, rgba(79, 182, 255, 0) 72%);
+			pointer-events: none;
+		}
+
+		.hero-kicker {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 12px;
+			border-radius: 999px;
+			background: rgba(36, 152, 235, 0.12);
+			border: 1px solid rgba(79, 182, 255, 0.25);
+			color: #cfe7ff;
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			margin-bottom: 16px;
+		}
+
+		.hero-logo {
+			font-size: clamp(2.6rem, 7vw, 6rem);
+			line-height: 0.9;
+			letter-spacing: -0.06em;
+			font-weight: 900;
+			margin: 0 0 14px;
+			color: #f2f8ff;
+			text-wrap: balance;
+		}
+
+		.hero-subtitle {
+			max-width: 64ch;
+			color: var(--muted);
+			font-size: 1.05rem;
+			line-height: 1.65;
+			margin: 0;
+		}
+
+		.modular-panel {
+			padding: 20px;
+		}
+
+		.modular-grid {
+			display: grid;
+			grid-template-columns: 1fr 1.25fr 1fr;
+			gap: 16px;
+		}
+
+		.feature-card {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			min-height: 220px;
+			padding: 20px;
+			border-radius: 18px;
+			border: 1px solid rgba(111, 168, 255, 0.12);
+			background:
+				linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+			overflow: hidden;
+		}
+
+		.feature-card::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(79, 182, 255, 0.04), transparent 55%);
+			pointer-events: none;
+		}
+
+		.feature-card.featured {
+			border-color: rgba(111, 168, 255, 0.24);
+			background:
+				radial-gradient(circle at top right, rgba(53, 176, 255, 0.14), transparent 40%),
+				linear-gradient(180deg, rgba(15, 34, 57, 0.96) 0%, rgba(8, 19, 35, 0.94) 100%);
+			transform: translateY(-2px);
+		}
+
+		.card-top {
+			position: relative;
+			z-index: 1;
+		}
+
+		.card-label {
+			display: inline-flex;
+			align-items: center;
+			font-size: 11px;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: #cfe2ff;
+			padding: 7px 10px;
+			border-radius: 999px;
+			background: rgba(36, 152, 235, 0.1);
+			border: 1px solid rgba(79, 182, 255, 0.18);
+			margin-bottom: 14px;
+		}
+
+		.card-title {
+			margin: 0 0 10px;
+			font-size: 1.2rem;
+			line-height: 1.15;
+			letter-spacing: -0.03em;
+			color: #f3f8ff;
+		}
+
+		.featured .card-title {
+			font-size: 1.45rem;
+		}
+
+		.card-copy {
+			margin: 0;
+			color: var(--muted);
+			line-height: 1.6;
+			font-size: 0.97rem;
+			max-width: 38ch;
+		}
+
+		.card-actions,
+		.card-meta {
+			position: relative;
+			z-index: 1;
+			margin-top: 18px;
+		}
+
+		.card-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 12px 16px;
+			border-radius: 12px;
+			background: linear-gradient(180deg, #35b0ff 0%, #1f8fe0 100%);
+			color: white;
+			font-weight: 800;
+			font-size: 14px;
+			border: 1px solid rgba(120, 200, 255, 0.35);
+			box-shadow: 0 12px 28px rgba(36, 152, 235, 0.24);
+			text-decoration: none;
+		}
+
+		.card-button:hover {
+			text-decoration: none;
+			filter: brightness(1.05);
+		}
+
+		.card-list {
+			margin: 0;
+			padding-left: 18px;
+			color: var(--muted);
+			line-height: 1.65;
+			font-size: 0.96rem;
+		}
+
+		.card-placeholder {
+			margin-top: 14px;
+			padding: 16px;
+			border-radius: 14px;
+			border: 1px dashed rgba(111, 168, 255, 0.22);
+			background: rgba(255, 255, 255, 0.025);
+			color: #a8bfdc;
+			font-size: 0.95rem;
+			line-height: 1.55;
+			min-height: 92px;
+			display: flex;
+			align-items: center;
+		}
+
+		.page-shell {
+			display: grid;
+			grid-template-columns: minmax(360px, 520px) minmax(420px, 1fr);
+			gap: 24px;
+			align-items: start;
 		}
 
 		.brand-panel {
@@ -430,8 +617,13 @@
 		}
 
 		@media (max-width: 1080px) {
+			.modular-grid,
 			.page-shell {
 				grid-template-columns: 1fr;
+			}
+
+			.feature-card.featured {
+				transform: none;
 			}
 
 			.brand-panel {
@@ -453,6 +645,8 @@
 				padding: 14px;
 			}
 
+			.hero-panel,
+			.modular-panel,
 			.brand-panel,
 			.live-panel {
 				padding: 16px;
@@ -474,8 +668,13 @@
 
 			.control-button,
 			.control-button-primary,
-			.lang-toggle-btn {
+			.lang-toggle-btn,
+			.card-button {
 				width: 100%;
+			}
+
+			.hero-logo {
+				font-size: 2.6rem;
 			}
 
 			#output.output {
@@ -491,98 +690,192 @@
 		<button id="dismissError">Dismiss</button>
 	</div>
 
-	<div class="page-shell">
-		<aside class="brand-panel">
-			<div class="eyebrow">Buon Inglese • Live Tool</div>
-			<h1 class="brand-title">Live captions for <span>English ↔ Italian</span></h1>
-			<p class="brand-copy">
-				A free browser tool by Buon Inglese for live English–Italian captions, lessons, speaking practice, and bilingual conversation support.
+	<div class="site-wrap">
+		<section class="hero-panel">
+			<div class="hero-kicker">Buon Inglese • Bari</div>
+			<h1 class="hero-logo">BUONINGLESE.COM</h1>
+			<p class="hero-subtitle">
+				Private English lessons in Bari, plus a practical set of live English–Italian tools for lessons, speaking practice, online calls, and bilingual support.
 			</p>
-			<p class="brand-descriptor">Private English Lessons in Bari</p>
+		</section>
 
-			<div class="info-grid">
-				<div class="info-card">
-					<div class="info-card-label">Source language</div>
-					<div class="info-card-value">English or Italian only</div>
-				</div>
-				<div class="info-card">
-					<div class="info-card-label">Target language</div>
-					<div class="info-card-value">Automatic opposite translation</div>
-				</div>
-				<div class="info-card">
-					<div class="info-card-label">Best browser</div>
-					<div class="info-card-value">Chrome or Edge</div>
-				</div>
-				<div class="info-card">
-					<div class="info-card-label">Use case</div>
-					<div class="info-card-value">Lessons, calls, practice, accessibility</div>
-				</div>
+		<section class="modular-panel">
+			<div class="modular-grid">
+				<article class="feature-card">
+					<div class="card-top">
+						<div class="card-label">Lessons</div>
+						<h2 class="card-title">Private English Lessons in Bari</h2>
+						<p class="card-copy">
+							One-to-one English support focused on speaking, confidence, exams, and practical communication.
+						</p>
+					</div>
+					<div class="card-actions">
+						<a class="card-button" href="mailto:sebastian@buoninglese.com?subject=Private%20English%20Lessons%20in%20Bari">Email Sebastian</a>
+					</div>
+				</article>
+
+				<article class="feature-card featured">
+					<div class="card-top">
+						<div class="card-label">Featured tool</div>
+						<h2 class="card-title">Live Speech Dashboard</h2>
+						<p class="card-copy">
+							Speak in English or Italian and open a clean bilingual dashboard with live source captions and translated output for lessons, accessibility, or practice.
+						</p>
+					</div>
+					<div class="card-actions">
+						<div class="card-placeholder">
+							This section supports the live dashboard concept and can later be connected to the overlay, a Framer embed, or a featured lesson workflow.
+						</div>
+					</div>
+				</article>
+
+				<article class="feature-card">
+					<div class="card-top">
+						<div class="card-label">How it works</div>
+						<h2 class="card-title">Quick start</h2>
+						<ol class="card-list">
+							<li>Allow microphone access.</li>
+							<li>Choose English or Italian.</li>
+							<li>Open the live dashboard.</li>
+							<li>Use it in class, on calls, or while practicing.</li>
+						</ol>
+					</div>
+				</article>
+
+				<article class="feature-card">
+					<div class="card-top">
+						<div class="card-label">Text block</div>
+						<h2 class="card-title">Flexible content area</h2>
+						<p class="card-copy">
+							Use this block for explanatory text, a short offer, a testimonial, or a note about your lessons and services.
+						</p>
+					</div>
+					<div class="card-meta">
+						<div class="card-placeholder">Write any text here and keep this as a reusable homepage content block.</div>
+					</div>
+				</article>
+
+				<article class="feature-card">
+					<div class="card-top">
+						<div class="card-label">Embed block</div>
+						<h2 class="card-title">Space for embeds</h2>
+						<p class="card-copy">
+							Use this area for an iframe, scheduler, Framer embed, dashboard preview, or another tool.
+						</p>
+					</div>
+					<div class="card-meta">
+						<div class="card-placeholder">Drop an embed, widget, booking tool, or featured interactive module here.</div>
+					</div>
+				</article>
+
+				<article class="feature-card">
+					<div class="card-top">
+						<div class="card-label">Image / note block</div>
+						<h2 class="card-title">Visual or promotional space</h2>
+						<p class="card-copy">
+							Use this card for an image, graphic, quote, promo note, or another short message.
+						</p>
+					</div>
+					<div class="card-meta">
+						<div class="card-placeholder">Reserve this for an image, announcement, testimonial, or another compact feature.</div>
+					</div>
+				</article>
 			</div>
+		</section>
 
-			<h2 class="section-title">How it works</h2>
-			<ol class="steps">
-				<li>Allow microphone access.</li>
-				<li>Choose the source language using the EN/IT toggle.</li>
-				<li>Speak naturally and watch the captions appear live.</li>
-				<li>Open the dashboard to display the bilingual overlay.</li>
-			</ol>
+		<div class="page-shell">
+			<aside class="brand-panel">
+				<div class="eyebrow">Buon Inglese • Live Tool</div>
+				<h1 class="brand-title">Live captions for <span>English ↔ Italian</span></h1>
+				<p class="brand-copy">
+					A free browser tool by Buon Inglese for live English–Italian captions, lessons, speaking practice, and bilingual conversation support.
+				</p>
+				<p class="brand-descriptor">Private English Lessons in Bari</p>
 
-			<h2 class="section-title">Notes</h2>
-			<ul class="tips">
-				<li>This version is locked to English and Italian only.</li>
-				<li>English speech produces Italian translation in the overlay.</li>
-				<li>Italian speech produces English translation in the overlay.</li>
-				<li>You can still download an SRT transcript or copy a Framer embed snippet.</li>
-			</ul>
+				<div class="info-grid">
+					<div class="info-card">
+						<div class="info-card-label">Source language</div>
+						<div class="info-card-value">English or Italian only</div>
+					</div>
+					<div class="info-card">
+						<div class="info-card-label">Target language</div>
+						<div class="info-card-value">Automatic opposite translation</div>
+					</div>
+					<div class="info-card">
+						<div class="info-card-label">Best browser</div>
+						<div class="info-card-value">Chrome or Edge</div>
+					</div>
+					<div class="info-card">
+						<div class="info-card-label">Use case</div>
+						<div class="info-card-value">Lessons, calls, practice, accessibility</div>
+					</div>
+				</div>
 
-			<div class="share-box">
-				<strong>Overlay URL</strong>
-				<a id="shareLink" href="overlay.html" target="_blank" rel="noopener noreferrer">*ERROR GENERATING LINK*</a>
-			</div>
+				<h2 class="section-title">How it works</h2>
+				<ol class="steps">
+					<li>Allow microphone access.</li>
+					<li>Choose the source language using the EN/IT toggle.</li>
+					<li>Speak naturally and watch the captions appear live.</li>
+					<li>Open the dashboard to display the bilingual overlay.</li>
+				</ol>
 
-			<div class="footer-note">
-				<strong>Contact</strong><br />
-				Private English Lessons in Bari ·
-				<a href="mailto:sebastian@buoninglese.com">sebastian@buoninglese.com</a><br />
-				This tool is designed for live bilingual captions and practice support.
-			</div>
-		</aside>
+				<h2 class="section-title">Notes</h2>
+				<ul class="tips">
+					<li>This version is locked to English and Italian only.</li>
+					<li>English speech produces Italian translation in the overlay.</li>
+					<li>Italian speech produces English translation in the overlay.</li>
+					<li>You can still download an SRT transcript or copy a Framer embed snippet.</li>
+				</ul>
 
-		<main class="live-panel">
-			<div class="topbar">
-				<div class="topbar-left">
-					<div class="source-wrap">
-						<span class="source-label">Source</span>
-						<button id="langToggleBtn" class="lang-toggle-btn" title="Switch source language (Ctrl+L)">
-							<span id="langToggleCurrent">EN</span>
-						</button>
+				<div class="share-box">
+					<strong>Overlay URL</strong>
+					<a id="shareLink" href="overlay.html" target="_blank" rel="noopener noreferrer">*ERROR GENERATING LINK*</a>
+				</div>
+
+				<div class="footer-note">
+					<strong>Contact</strong><br />
+					Private English Lessons in Bari ·
+					<a href="mailto:sebastian@buoninglese.com">sebastian@buoninglese.com</a><br />
+					This tool is designed for live bilingual captions and practice support.
+				</div>
+			</aside>
+
+			<main class="live-panel">
+				<div class="topbar">
+					<div class="topbar-left">
+						<div class="source-wrap">
+							<span class="source-label">Source</span>
+							<button id="langToggleBtn" class="lang-toggle-btn" title="Switch source language (Ctrl+L)">
+								<span id="langToggleCurrent">EN</span>
+							</button>
+						</div>
+
+						<div class="status-pill">
+							<span class="status-dot"></span>
+							<span>Live capture ready</span>
+						</div>
 					</div>
 
-					<div class="status-pill">
-						<span class="status-dot"></span>
-						<span>Live capture ready</span>
+					<div id="cnControls" class="control-buttons">
+						<button id="toggleTranscription" class="hidden control-button">Pause Transcription</button>
 					</div>
 				</div>
 
-				<div id="cnControls" class="control-buttons">
-					<button id="toggleTranscription" class="hidden control-button">Pause Transcription</button>
+				<div class="caption-shell">
+					<section class="interim-box">
+						<div class="box-header">Listening now</div>
+						<div id="interm" class="output">
+							<span>Waiting for microphone input…</span>
+						</div>
+					</section>
+
+					<section class="output-box">
+						<div class="box-header">Transcript</div>
+						<div id="output" class="output"></div>
+					</section>
 				</div>
-			</div>
-
-			<div class="caption-shell">
-				<section class="interim-box">
-					<div class="box-header">Listening now</div>
-					<div id="interm" class="output">
-						<span>Waiting for microphone input…</span>
-					</div>
-				</section>
-
-				<section class="output-box">
-					<div class="box-header">Transcript</div>
-					<div id="output" class="output"></div>
-				</section>
-			</div>
-		</main>
+			</main>
+		</div>
 	</div>
 
 	<script src="security-utils.js"></script>
