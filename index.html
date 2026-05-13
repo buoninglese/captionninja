@@ -562,7 +562,7 @@
 		<ol>
 			<li>Accept the microphone permissions when prompted.</li>
 			<li>Start speaking - your words will appear as captions.</li>
-		<!-- <li>For live streaming, add this link to OBS as a browser source overlay: 👉 <a id="shareLink" href="overlay.html" target='_blank'>*ERROR GENERATING LINK*</a></li>-->
+		<a id="shareLink" href="overlay.html" target='_blank'>*ERROR GENERATING LINK*</a>
 		</ol>
 
 		<strong>💡 Tips:</strong>
@@ -1166,330 +1166,373 @@ function rebuildSrtFile() {
 	  };
 	}
 		
-	var ends = 0;
-	var final_transcript = '';
-	var interim_transcript = "";
-	var recognition = null;
-	var idle = null;
-	var silenceTimer = null;      // Option 1: timer for auto-finalization
-	var pendingInterim = "";      // Option 1: current interim text to finalize
-	setup();
-	var startd = false;
-	function setup() {
-	  if ('webkitSpeechRecognition' in window) {
-		if (recognition) {
-		  recognition.onend = null;
-		  recognition.abort();
-		}
-		recognition = new webkitSpeechRecognition();
-		if (myLang) {
-		  recognition.lang = myLang;
-		}
-		recognition.continuous = true;
-		recognition.interimResults = true;
-		
-		recognition.onstart = function() {
-		  console.log("started transcription");
-		  setTimeout(function() {
-			ends = 0;
-		  }, 2000);
-		};
-		
-		recognition.onerror = function(event) {
-		  console.log(event);
-		  if (event.error === 'network') {
-			handleNetworkError();
-		  }
-		};
+var ends = 0;
+var final_transcript = '';
+var interim_transcript = "";
+var recognition = null;
+var idle = null;
+var silenceTimer = null;
+var pendingInterim = "";
+var startd = false;
 
-		
-		recognition.onend = function(e) {
-		  if (isPaused) return;
-		  console.log(e);
-		  console.log("Stopped transcription");
-		  
-			  if (startd) {
-				let currentInterim = document.getElementById("interm").innerText.trim();
-				if (currentInterim) {
-				  counter += 1;
-				  const direction = detectTextDirection(currentInterim);
-				  document.getElementById("output").innerHTML += `<span id='final_${counter}' dir='${direction}'>${escapeHTML(currentInterim)}</span><br />`;
-				  document.getElementById("interm").innerHTML = "";
-			  
-			  try {
-				if (label) {
-				  publishCaption({"msg":true, "final":currentInterim, "id":counter, "label":label, "ln": myLang});
-				} else {
-				  publishCaption({"msg":true, "final":currentInterim, "id":counter, "ln": myLang});
-				}
-			  } catch(e) {
-				console.error(e);
-			  }
-			}
-		  }
-		  
-		  if (e.type === "end") {
-			ends += 1;
-		  }
-		  if (ends > 3) {
-			alert("WARNING: Cannot enable transcription service\n\nThe service will fail completely if more than one transcription session is currently active on your computer.\n\nPlease close other Caption.Ninja tabs or other transcription services and then wait a few minutes before retrying.\n\nIt might also fail if your browser does not offer a transcription service; use the official Chrome browser instead if unsure.");
-		  }
-		  
-		  setTimeout(setup, 100);
-		};
+async function setup() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-		recognition.onresult = function(event) {
-		  if(typeof(event.results) == 'undefined') return;
-		  
-		  // Auto-dismiss security warning when we get actual speech results
-		  const warningElement = document.getElementById('stream-security-warning');
-		  if (warningElement) {
-			warningElement.style.animation = 'fadeOut 0.3s ease-out';
-			setTimeout(() => warningElement.remove(), 300);
-		  }
-		  
-		  let interim_transcript = '';
-		  let new_final_transcript = '';
-		  
-		  for(let i = event.resultIndex; i < event.results.length; ++i) {
-		    const transcript = sanitize(event.results[i][0].transcript);
-		    const direction = detectTextDirection(transcript);
-		    
-		    if(event.results[i].isFinal) {
-		      // Clear silence timer since we got a real final
-		      if (silenceTimer) {
-		        clearTimeout(silenceTimer);
-		        silenceTimer = null;
-		      }
-				      pendingInterim = "";
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showErrorBanner("Microphone access is not supported in this browser.");
+    return;
+  }
 
-				      new_final_transcript += ' ' + transcript;
-				      document.getElementById("output").innerHTML += `<span id='final_${counter}' dir='${direction}'>${escapeHTML(transcript)}</span><br />`;
-				      document.getElementById("interm").innerHTML = "";
-			      try {
-			        if (label) {
-			          publishCaption({"msg":true, "final":transcript, "id":counter, "label":label, "ln": myLang});
-			        } else {
-		          publishCaption({"msg":true, "final":transcript, "id":counter, "ln": myLang});
-		        }
-		        // Optional: speak final results locally if TTS is enabled
-		        if (window.CAPTION_TTS && typeof window.CAPTION_TTS.speak === 'function') {
-		          window.CAPTION_TTS.speak(transcript);
-		        }
-		      } catch(e) {
-		        console.error(e);
-		      }
-		      
-		      counter += 1;
-		    } else {
-		      interim_transcript += " " + transcript;
-		    }
-		  }
-		  
-  if (interim_transcript.trim()) {
-    // Mark the start of this segment on first interim token
-    if (timestamp_intern === null) { timestamp_intern = Date.now(); }
+  if (!SpeechRecognition) {
+    showErrorBanner("Speech recognition is not supported in this browser. Please use Chrome or Safari.");
+    return;
+  }
 
-    let textToProcess = interim_transcript.trim();
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    console.error("Microphone permission error:", err);
+    showErrorBanner("Microphone permission was denied or unavailable.");
+    return;
+  }
 
-    // Option 4: Auto-split on sentence boundaries
-    if (autoSplit) {
-      const { complete, remaining } = extractCompleteSentences(textToProcess);
+  if (recognition) {
+    recognition.onend = null;
+    try {
+      recognition.abort();
+    } catch (e) {
+      console.warn(e);
+    }
+  }
 
-      // Send each complete sentence as final
-		      for (const sentence of complete) {
-		        counter += 1;
-		        const dir = detectTextDirection(sentence);
-		        document.getElementById("output").innerHTML += `<span id='final_${counter}' dir='${dir}'>${escapeHTML(sentence)}</span><br />`;
-	        try {
-	          var msgObj = {"msg":true, "final": sentence, "id":counter, "ln": myLang};
-	          if (label) msgObj.label = label;
-	          publishCaption(msgObj);
-        } catch(e) {
+  recognition = new SpeechRecognition();
+
+  if (myLang) recognition.lang = myLang;
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onstart = function () {
+    console.log("started transcription");
+    setTimeout(function () {
+      ends = 0;
+    }, 2000);
+  };
+
+  recognition.onerror = function (event) {
+    console.log(event);
+    if (event.error === "network") {
+      handleNetworkError();
+    } else if (event.error === "not-allowed") {
+      showErrorBanner("Microphone access was blocked. Please allow it and reload.");
+    } else if (event.error === "service-not-allowed") {
+      showErrorBanner("Speech recognition service is not allowed in this browser.");
+    } else {
+      showErrorBanner("Speech recognition error: " + event.error);
+    }
+  };
+
+  recognition.onend = function (e) {
+    if (isPaused) return;
+
+    console.log(e);
+    console.log("Stopped transcription");
+
+    if (startd) {
+      let currentInterim = document.getElementById("interm").innerText.trim();
+      if (currentInterim) {
+        counter += 1;
+        const direction = detectTextDirection(currentInterim);
+        document.getElementById("output").innerHTML += `<span id='final_${counter}' dir='${direction}'>${escapeHTML(currentInterim)}</span><br />`;
+        document.getElementById("interm").innerHTML = "";
+
+        try {
+          if (label) {
+            publishCaption({ msg: true, final: currentInterim, id: counter, label: label, ln: myLang });
+          } else {
+            publishCaption({ msg: true, final: currentInterim, id: counter, ln: myLang });
+          }
+        } catch (e) {
           console.error(e);
         }
       }
-
-      // Only keep remaining incomplete text as interim
-      textToProcess = remaining;
     }
 
-    // Option 2: Apply word/character truncation
-    textToProcess = truncateInterim(textToProcess);
+    if (e && e.type === "end") {
+      ends += 1;
+    }
 
-	    if (textToProcess) {
-	      // Option 1: Store for potential auto-finalization and reset timer
-	      pendingInterim = textToProcess;
-	      if (autoFinalMs > 0) {
-	        if (silenceTimer) clearTimeout(silenceTimer);
-        silenceTimer = setTimeout(forceFinalization, autoFinalMs);
-      }
+    if (ends > 3) {
+      showErrorBanner("Transcription failed repeatedly. Try Chrome or Safari, and make sure no other speech tool is running.");
+      return;
+    }
 
-	      const direction = detectTextDirection(textToProcess);
-	      document.getElementById("interm").innerHTML = `<span dir='${direction}'>${escapeHTML(textToProcess)}</span><br />`;
-
-      try {
-        var msgObj = {"msg":true, "interm":textToProcess, "id":counter, "ln": myLang};
-        if (label) msgObj.label = label;
-        publishCaption(msgObj);
-
-        // Optional: streaming TTS for interim when explicitly requested
-        if (window.CAPTION_TTS && window.CAPTION_TTS.stream && typeof window.CAPTION_TTS.speak === 'function') {
-          window.CAPTION_TTS.speak(textToProcess, true);
+    setTimeout(() => {
+      if (!isPaused) {
+        try {
+          recognition.start();
+        } catch (err) {
+          console.error("Restart failed:", err);
         }
-	      } catch(e) {
-	        console.error(e);
-	      }
-	    } else {
-	      document.getElementById("interm").innerHTML = "";
-	      pendingInterim = "";
-	      if (silenceTimer) {
-	        clearTimeout(silenceTimer);
-	        silenceTimer = null;
-	      }
-	    }
-	  }
-		  
-		  final_transcript = new_final_transcript.trim();
-		  
-      // Initialize session start once; do not set per-cue start here
-      if (timestamp_start === null) {
-        timestamp_start = Date.now();
       }
-		  
-		  if (final_transcript) {
-		    console.log("FINAL:", final_transcript);
-		    startd = true;
-		    try {
-      // Compute start and end times for this cue
-      // End time is now relative to session start
-      var endMs = Date.now() - timestamp_start;
-      // Start time is when the first interim of this segment arrived; if we didn't
-      // get any interim (edge case), fall back to previous cue's end
-      var startMs;
+    }, 200);
+  };
+
+  recognition.onresult = function(event) {
+    if (typeof(event.results) === 'undefined') return;
+
+    const warningElement = document.getElementById('stream-security-warning');
+    if (warningElement) {
+      warningElement.style.animation = 'fadeOut 0.3s ease-out';
+      setTimeout(() => warningElement.remove(), 300);
+    }
+
+    let interim_transcript = '';
+    let new_final_transcript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      const transcript = sanitize(event.results[i][0].transcript);
+      const direction = detectTextDirection(transcript);
+
+      if (event.results[i].isFinal) {
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          silenceTimer = null;
+        }
+        pendingInterim = "";
+
+        new_final_transcript += " " + transcript;
+        document.getElementById("output").innerHTML += `<span id='final_${counter}' dir='${direction}'>${escapeHTML(transcript)}</span><br />`;
+        document.getElementById("interm").innerHTML = "";
+
+        try {
+          if (label) {
+            publishCaption({ msg: true, final: transcript, id: counter, label: label, ln: myLang });
+          } else {
+            publishCaption({ msg: true, final: transcript, id: counter, ln: myLang });
+          }
+
+          if (window.CAPTION_TTS && typeof window.CAPTION_TTS.speak === 'function') {
+            window.CAPTION_TTS.speak(transcript);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        counter += 1;
+      } else {
+        interim_transcript += " " + transcript;
+      }
+    }
+
+    if (interim_transcript.trim()) {
       if (timestamp_intern === null) {
-        // Prefer last cue's end if we have trimmed it; fallback to lastStopMs
-        if (srtCues.length > 0) {
-          startMs = srtCues[srtCues.length - 1].endMs;
-        } else {
-          startMs = lastStopMs;
+        timestamp_intern = Date.now();
+      }
+
+      let textToProcess = interim_transcript.trim();
+
+      if (autoSplit) {
+        const parts = extractCompleteSentences(textToProcess);
+        const complete = parts.complete;
+        const remaining = parts.remaining;
+
+        for (const sentence of complete) {
+          counter += 1;
+          const dir = detectTextDirection(sentence);
+          document.getElementById("output").innerHTML += `<span id='final_${counter}' dir='${dir}'>${escapeHTML(sentence)}</span><br />`;
+          try {
+            var msgObj = { msg: true, final: sentence, id: counter, ln: myLang };
+            if (label) msgObj.label = label;
+            publishCaption(msgObj);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        textToProcess = remaining;
+      }
+
+      textToProcess = truncateInterim(textToProcess);
+
+      if (textToProcess) {
+        pendingInterim = textToProcess;
+
+        if (autoFinalMs > 0) {
+          if (silenceTimer) clearTimeout(silenceTimer);
+          silenceTimer = setTimeout(forceFinalization, autoFinalMs);
+        }
+
+        const direction = detectTextDirection(textToProcess);
+        document.getElementById("interm").innerHTML = `<span dir='${direction}'>${escapeHTML(textToProcess)}</span><br />`;
+
+        try {
+          var interimMsgObj = { msg: true, interm: textToProcess, id: counter, ln: myLang };
+          if (label) interimMsgObj.label = label;
+          publishCaption(interimMsgObj);
+
+          if (window.CAPTION_TTS && window.CAPTION_TTS.stream && typeof window.CAPTION_TTS.speak === 'function') {
+            window.CAPTION_TTS.speak(textToProcess, true);
+          }
+        } catch (e) {
+          console.error(e);
         }
       } else {
-        startMs = timestamp_intern - timestamp_start;
+        document.getElementById("interm").innerHTML = "";
+        pendingInterim = "";
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          silenceTimer = null;
+        }
       }
+    } else {
+      document.getElementById("interm").innerHTML = "";
+    }
 
-      // Enforce minimum cue duration unless it would overlap the next cue
-      if ((endMs - startMs) < MIN_CUE_MS) {
-        endMs = startMs + MIN_CUE_MS;
+    final_transcript = new_final_transcript.trim();
+
+    if (timestamp_start === null) {
+      timestamp_start = Date.now();
+    }
+
+    if (final_transcript) {
+      console.log("FINAL:", final_transcript);
+      startd = true;
+
+      try {
+        var endMs = Date.now() - timestamp_start;
+        var startMs;
+
+        if (timestamp_intern === null) {
+          if (srtCues.length > 0) {
+            startMs = srtCues[srtCues.length - 1].endMs;
+          } else {
+            startMs = lastStopMs;
+          }
+        } else {
+          startMs = timestamp_intern - timestamp_start;
+        }
+
+        if ((endMs - startMs) < MIN_CUE_MS) {
+          endMs = startMs + MIN_CUE_MS;
+        }
+
+        if (srtCues.length > 0) {
+          var prev = srtCues[srtCues.length - 1];
+          var maxEndAllowed = startMs;
+          var minEndDesired = prev.startMs + MIN_CUE_MS;
+          prev.endMs = Math.min(maxEndAllowed, Math.max(prev.endMs, minEndDesired));
+          if (prev.endMs < prev.startMs) prev.endMs = prev.startMs;
+        }
+
+        srtCues.push({ startMs: startMs, endMs: endMs, text: final_transcript });
+        rebuildSrtFile();
+
+        lastStopMs = endMs;
+        timestamp_intern = null;
+        setStorage("transcription_" + roomID + "_" + timestamp_start, srtFile, 1);
+
+        if (window.CAPTION_TTS && typeof window.CAPTION_TTS.speak === 'function') {
+          window.CAPTION_TTS.speak(final_transcript);
+        }
+
+        if (srtCues.length === 1) {
+          var button = document.createElement("button");
+          button.onclick = function() {
+            try { rebuildSrtFile(); } catch (e) { console.warn(e); }
+            download("transcription_" + roomID + "_" + timestamp_start + ".srt", srtFile);
+          };
+          button.innerHTML = "Download transcription";
+          button.className = "control-button";
+
+          var shareButton = document.createElement("button");
+          shareButton.onclick = function() {
+            const overlayUrl = url + "/overlay?room=" + roomID;
+            navigator.clipboard.writeText(overlayUrl).then(() => {
+              shareButton.innerHTML = "Link Copied!";
+              setTimeout(() => shareButton.innerHTML = "Copy Overlay Link", 2000);
+            });
+          };
+          shareButton.innerHTML = "Copy Overlay Link";
+          shareButton.className = "control-button";
+
+          var controlContainer = document.querySelector('.control-buttons');
+          if (!controlContainer) {
+            controlContainer = document.createElement("div");
+            controlContainer.className = "control-buttons";
+            document.body.appendChild(controlContainer);
+          }
+
+          var customizeButton = document.createElement("button");
+          customizeButton.onclick = function() {
+            openCustomizeModal();
+          };
+          customizeButton.innerHTML = "Customize Overlay";
+          customizeButton.className = "control-button";
+
+          controlContainer.appendChild(button);
+          controlContainer.appendChild(shareButton);
+          controlContainer.appendChild(customizeButton);
+          toggleButton.classList.remove("hidden");
+          controlContainer.appendChild(toggleButton);
+        }
+      } catch (e) {
+        console.error(e);
       }
+    }
+  };
 
-      // If this cue starts before/at the previous cue's end, trim the previous cue
-      // and try to keep at least MIN_CUE_MS when there is room.
-      if (srtCues.length > 0) {
-        var prev = srtCues[srtCues.length - 1];
-        var maxEndAllowed = startMs; // cannot exceed new cue's start
-        var minEndDesired = prev.startMs + MIN_CUE_MS; // prefer this if space allows
-        // First, ensure previous meets minimum if possible; then clamp to avoid overlap
-        prev.endMs = Math.min(maxEndAllowed, Math.max(prev.endMs, minEndDesired));
-        // Never allow end before start (can happen if maxEndAllowed < start+min)
-        if (prev.endMs < prev.startMs) prev.endMs = prev.startMs;
-      }
+  try {
+    if (!isPaused) {
+      recognition.start();
+    }
+  } catch (err) {
+    console.error("Initial recognition start failed:", err);
+    showErrorBanner("Could not start speech recognition.");
+  }
+}
 
-      // Add this cue
-      srtCues.push({ startMs: startMs, endMs: endMs, text: final_transcript });
-      rebuildSrtFile();
+// Optional: open a separate TTS window powered by tts.rocks bridge
+try {
+  if (urlParams.has('ttspopout')) {
+    var qs = new URLSearchParams(window.location.search);
+    qs.set('room', roomID);
+    var bridgeUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '') + '/tts.rocks/caption-bridge.html?' + qs.toString();
+    window.open(bridgeUrl, '_blank', 'noopener');
+  }
+} catch (e) {
+  console.warn(e);
+}
 
-      // Prepare for the next segment
-      lastStopMs = endMs;
-      timestamp_intern = null;
-		      setStorage("transcription_"+roomID+"_"+timestamp_start, srtFile, 1);
-		      // Speak any aggregated final text that was appended on end
-		      if (window.CAPTION_TTS && typeof window.CAPTION_TTS.speak === 'function') {
-		        window.CAPTION_TTS.speak(final_transcript);
-		      }
-		      
-      if (srtCues.length === 1) {
-        // UI setup code remains unchanged
-        var button = document.createElement("button");
-        button.onclick = function() {
-          // Rebuild just before download to guarantee latest min/trim rules
-          try { rebuildSrtFile(); } catch (e) { console.warn(e); }
-          download("transcription_"+roomID+"_"+timestamp_start+".srt", srtFile);
-        };
-        button.innerHTML = "Download transcription";
-        button.className = "control-button";
-		
-		        var shareButton = document.createElement("button");
-		        shareButton.onclick = function() {
-		          const overlayUrl = url+"/overlay?room="+roomID;
-		          navigator.clipboard.writeText(overlayUrl).then(() => {
-		            shareButton.innerHTML = "Link Copied!";
-		            setTimeout(() => shareButton.innerHTML = "Copy Overlay Link", 2000);
-		          });
-		        };
-		        shareButton.innerHTML = "Copy Overlay Link";
-		        shareButton.className = "control-button";
-		
-		        var controlContainer = document.querySelector('.control-buttons');
-		        if (!controlContainer) {
-		          controlContainer = document.createElement("div");
-		          controlContainer.className = "control-buttons";
-		          document.body.appendChild(controlContainer);
-		        }
-		        // Customize Overlay button
-		        var customizeButton = document.createElement("button");
-		        customizeButton.onclick = function() {
-		          openCustomizeModal();
-		        };
-		        customizeButton.innerHTML = "Customize Overlay";
-		        customizeButton.className = "control-button";
+if (urlParams.has("test")) {
+  setInterval(function() {
+    counter += 1;
+    publishCaption({ msg: true, final: counter, id: counter });
+  }, 500);
+}
 
-		        controlContainer.appendChild(button);
-		        controlContainer.appendChild(shareButton);
-		        controlContainer.appendChild(customizeButton);
-		        toggleButton.classList.remove("hidden");
-		        document.querySelector('.control-buttons').appendChild(toggleButton);
-		      }
-		    } catch(e) {
-		      console.error(e);
-		    }
-		  }
-		};
-		
-		if (!isPaused) {
-		  recognition.start();
-		}
-	  }
-	}
+window.addEventListener('online', function() {
+  document.getElementById('errorBanner').style.display = 'none';
+});
 
-	// Optional: open a separate TTS window powered by tts.rocks bridge
-	try {
-	  if (urlParams.has('ttspopout')) {
-	    var qs = new URLSearchParams(window.location.search);
-	    // Ensure room param is present
-	    qs.set('room', roomID);
-	    var bridgeUrl = window.location.origin + window.location.pathname.replace(/\/[^^/]*$/, '') + '/tts.rocks/caption-bridge.html?' + qs.toString();
-	    window.open(bridgeUrl, '_blank', 'noopener');
-	  }
-	} catch (e) { console.warn(e); }
-			
-	if (urlParams.has("test")){
-		setInterval(function(){
-			counter += 1;
-			publishCaption({"msg":true, "final":counter, "id":counter});
-		},500);
-	}
-	
-	window.addEventListener('online', function() {
-	  document.getElementById('errorBanner').style.display = 'none';
-	  // Only restart recognition if it's not paused
-	  if (!isPaused) {
-		setup();
-	  }
-	});
-	
-	</script>
+window.addEventListener("load", function () {
+  const startBtn = document.createElement("button");
+  startBtn.textContent = "Start Captions";
+  startBtn.className = "control-button";
+  startBtn.style.position = "fixed";
+  startBtn.style.top = "60px";
+  startBtn.style.left = "10px";
+  startBtn.style.zIndex = "9999";
 
+  startBtn.onclick = async function () {
+    startBtn.disabled = true;
+    startBtn.textContent = "Starting...";
+    await setup();
+    startBtn.style.display = "none";
+  };
+
+  document.body.appendChild(startBtn);
+});
+</script>
 	<!-- Customize Overlay Modal -->
 	<div id="customizeModal" class="modal-overlay">
 		<div class="modal-content">
